@@ -1,8 +1,8 @@
 # swing-widgets
 
-Reusable Swing components. So far that is a set of date and time pickers: date, day and time
-panels, an analog clock, modal date/time dialogs and a date/time combo box (Swing has no date or
-time picker of its own). Each group of components has its own package under
+Reusable Swing components: date and time pickers (date, day and time panels, an analog clock,
+modal date/time dialogs and a date/time combo box; Swing has no date or time picker of its own)
+and a "recent items" menu. Each group of components has its own package under
 `us.bringardner.swing`.
 
 - **Java 11** or later
@@ -30,8 +30,9 @@ replacing that package with `us.bringardner.swing.datetime` in imports.
 | `us.bringardner.swing.datetime` | `DatePanel`, `DayPanel`, `TimePanel`, `Clock` | Date and time picker panels. |
 | | `DateDialog`, `TimeDialog`, `DateAndTimeDialog` | Modal dialogs built from the panels. |
 | | `DateTimeCombo` | A date/time spinner with a button that opens `DateAndTimeDialog`. |
+| `us.bringardner.swing.menu` | `RecentItemsMenu` | A "Recent ..." menu of any kind of item, saved with `java.util.prefs.Preferences`. |
 
-## Using the components
+## Date and time pickers
 
 The date and time components work together:
 
@@ -52,6 +53,30 @@ analog `Clock`, and can show seconds and milliseconds. The clock's hands can be 
 The parts of `TimePanel`, `DatePanel`, `DayPanel` and `DateTimeCombo` have names
 (`Component.getName()`), such as `hourSpinner`, `todayButton`, `btnBrowse` and `day1` to `day31`,
 so tests and GUI testing tools can find them.
+
+## Recent items menu
+
+`RecentItemsMenu<T>` keeps a newest-first list of items in a `Preferences` node. You give it a
+`Codec` that turns an item into one line of text and back:
+
+```java
+RecentItemsMenu<String> recent = new RecentItemsMenu<>("Recent Files",
+        Preferences.userNodeForPackage(MyApp.class),
+        new RecentItemsMenu.Codec<String>() {
+            public String encode(String path) { return path; }
+            public String decode(String line) { return line; }
+        });
+recent.addActionListener(e -> open((String) e.getSource()));
+fileMenu.add(recent);
+...
+recent.addItem(path);   // after opening a file
+```
+
+The menu has an item to set the maximum number of entries (10 by default), one to clear the list,
+and one item per entry. Choosing an entry moves it to the top and calls the menu's
+ActionListeners. Subclasses can override `getLabel` (the text shown), `isStale` (drop entries that
+no longer exist), `openItem` (what the event's source is, or null to cancel) and `merge` (keep
+state from the entry an item replaces).
 
 ## Building and testing
 

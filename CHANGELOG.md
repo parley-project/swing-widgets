@@ -13,4 +13,10 @@ only names changed.
   (parley-core) are now `us.bringardner.swing.datetime`.
 - Module name (`Automatic-Module-Name`): `us.bringardner.swing`.
 
+### Added
+
+- `us.bringardner.swing.menu.RecentItemsMenu`, a "Recent ..." menu of any kind of item, saved
+  with `java.util.prefs.Preferences`. It is the generic part of parley-files' `RecentFileMenu`
+  (BjlFileSystem's before that), which is now built on it.
+
 For earlier changes to these classes see the BjlCore changelog.
