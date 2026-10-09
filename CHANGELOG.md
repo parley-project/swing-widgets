@@ -8,7 +8,7 @@ only names changed.
 
 ### Changed (needs a code change)
 
-- Maven coordinates: add `us.bringardner:swing-widgets`. parley-core no longer has these classes.
+- Maven coordinates: add `us.bringardner:bringardner-swing-widgets`. parley-core no longer has these classes.
 - Package: `us.bringardner.core.swing` (BjlCore) and `us.bringardner.parley.core.swing`
   (parley-core) are now `us.bringardner.swing.datetime`.
 - Module name (`Automatic-Module-Name`): `us.bringardner.swing`.
