@@ -2,7 +2,7 @@
 
 Reusable Swing components: date and time pickers (date, day and time panels, an analog clock,
 modal date/time dialogs and a date/time combo box; Swing has no date or time picker of its own)
-and a "recent items" menu. Each group of components has its own package under
+a "recent items" menu, and a way to update a progress monitor from any thread. Each group of components has its own package under
 `us.bringardner.swing`.
 
 - **Java 11** or later
@@ -31,6 +31,7 @@ replacing that package with `us.bringardner.swing.datetime` in imports.
 | | `DateDialog`, `TimeDialog`, `DateAndTimeDialog` | Modal dialogs built from the panels. |
 | | `DateTimeCombo` | A date/time spinner with a button that opens `DateAndTimeDialog`. |
 | `us.bringardner.swing.menu` | `RecentItemsMenu` | A "Recent ..." menu of any kind of item, saved with `java.util.prefs.Preferences`. |
+| `us.bringardner.swing.progress` | `ProgressMonitorUpdater` | Lets any thread update a Swing `ProgressMonitor`; the changes are made on the event dispatch thread. |
 
 ## Date and time pickers
 

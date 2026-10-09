@@ -18,5 +18,7 @@ only names changed.
 - `us.bringardner.swing.menu.RecentItemsMenu`, a "Recent ..." menu of any kind of item, saved
   with `java.util.prefs.Preferences`. It is the generic part of parley-files' `RecentFileMenu`
   (BjlFileSystem's before that), which is now built on it.
+- `us.bringardner.swing.progress.ProgressMonitorUpdater`, which lets any thread update a Swing
+  `ProgressMonitor`. It is the code of parley-files' `ProgressMonitorProgress`, which now extends it.
 
 For earlier changes to these classes see the BjlCore changelog.
