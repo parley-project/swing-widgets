@@ -14,6 +14,27 @@ The date and time classes used to be the `us.bringardner.core.swing` package of 
 `us.bringardner.parley.core.swing` in parley-core). Moving over means adding this dependency and
 replacing that package with `us.bringardner.swing.datetime` in imports.
 
+## Why this library exists
+
+Swing leaves some everyday pieces out: it has no date or time picker, no "recent files" menu, and no
+safe way to update a progress monitor from a worker thread. Each application ended up writing its
+own. swing-widgets is where those pieces live once, for any Swing application.
+
+It's a library of its own, with no dependencies, for two reasons:
+
+- **The non-UI libraries stay free of Swing.** These classes used to be in BjlCore (later
+  parley-core), so every Parley protocol library, and every server or command-line tool using one,
+  carried Swing along. Now only applications with a Swing UI need it.
+- **It isn't tied to Parley.** Any Swing application can use it without pulling in Parley.
+
+[fx-widgets](https://github.com/tony-bringardner/fx-widgets) is the JavaFX counterpart, but not a
+copy: JavaFX already has much of what's here (CSS styling, `Alert`, prompt text, `Task` progress),
+so it only fills JavaFX's own gaps. The recent list behind both menus (`RecentItems`) is in this
+library because it has no UI and no dependencies, so both toolkits can reach it.
+
+**Use swing-widgets** when your application's UI is Swing. Swing runs on any desktop JDK from Java
+11, with nothing extra to install.
+
 ## Getting started
 
 ```xml
