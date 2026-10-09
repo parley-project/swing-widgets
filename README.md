@@ -32,6 +32,7 @@ replacing that package with `us.bringardner.swing.datetime` in imports.
 | | `DateDialog`, `TimeDialog`, `DateAndTimeDialog` | Modal dialogs built from the panels. |
 | | `DateTimeCombo` | A date/time spinner with a button that opens `DateAndTimeDialog`. |
 | `us.bringardner.swing.menu` | `RecentItemsMenu` | A "Recent ..." menu of any kind of item, saved with `java.util.prefs.Preferences`. |
+| | `RecentItems` | The list behind that menu, without any UI: newest first, a maximum, saved with `Preferences`. fx-widgets' JavaFX menu uses it too, so the two share a list. |
 | `us.bringardner.swing.progress` | `ProgressMonitorUpdater` | Lets any thread update a Swing `ProgressMonitor`; the changes are made on the event dispatch thread. |
 | `us.bringardner.swing.gradient` | `GradientPanel`, `GradientButton` | A panel painted with a two-color gradient, and a rounded gradient button. |
 | | `GradientColors` | The colors the gradient widgets use (a gold gradient by default); set them before creating widgets. |

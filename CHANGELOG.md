@@ -18,6 +18,9 @@ only names changed.
 - `us.bringardner.swing.menu.RecentItemsMenu`, a "Recent ..." menu of any kind of item, saved
   with `java.util.prefs.Preferences`. It is the generic part of parley-files' `RecentFileMenu`
   (BjlFileSystem's before that), which is now built on it.
+- `us.bringardner.swing.menu.RecentItems`: the list behind `RecentItemsMenu` (newest first, the
+  maximum, saving with `Preferences`), with no UI, so the JavaFX menu in fx-widgets can use it too.
+  `RecentItemsMenu` is built on it and works as before; `getRecentItems()` returns it.
 - `us.bringardner.swing.progress.ProgressMonitorUpdater`, which lets any thread update a Swing
   `ProgressMonitor`. It is the code of parley-files' `ProgressMonitorProgress`, which now extends it.
 - Gradient-styled widgets from BjlFileSystemViewer (now parley-files-viewer), which uses them from

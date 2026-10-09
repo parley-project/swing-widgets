@@ -25,11 +25,7 @@ package us.bringardner.swing.menu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.JMenu;
@@ -44,8 +40,9 @@ import javax.swing.JOptionPane;
  * moves the entry to the top and passes the event to the menu's ActionListeners with the
  * value openItem returned as its source.
  * <p>
- * A {@link Codec} turns each item into one line of text and back. Items are the same
- * entry when they are equal ({@link Object#equals(Object)}).
+ * The list itself is a {@link RecentItems}, which uses no UI toolkit; fx-widgets' JavaFX
+ * RecentItemsMenu uses it too. A {@link Codec} turns each item into one line of text and back.
+ * Items are the same entry when they are equal ({@link Object#equals(Object)}).
  * <p>
  * Subclasses can change the label shown for an item ({@link #getLabel(Object)}), drop items
  * that no longer exist ({@link #isStale(Object)}), and keep state from the entry an item
@@ -58,26 +55,17 @@ import javax.swing.JOptionPane;
 public class RecentItemsMenu<T> extends JMenu {
 
 	/** Turns an item into a single line of text and back. */
-	public interface Codec<T> {
-		/** @return the item as one line; it must not contain a line break */
-		String encode(T item);
-
-		/** @return the item a line holds; throw a RuntimeException if it's malformed, and the line is skipped */
-		T decode(String line);
+	public interface Codec<T> extends RecentItems.Codec<T> {
 	}
 
 	private static final long serialVersionUID = 1L;
-	private static final String NL = "\n";
 
 	/** The list: one encoded item per line, newest first. */
-	public static final String PREF_RECENT_LIST = "RecentFiles";
-	public static final String PREF_MAX_ITEMS = "MaxRecentFiles";
-	public static final int DEFAULT_MAX_ITEMS = 10;
+	public static final String PREF_RECENT_LIST = RecentItems.PREF_RECENT_LIST;
+	public static final String PREF_MAX_ITEMS = RecentItems.PREF_MAX_ITEMS;
+	public static final int DEFAULT_MAX_ITEMS = RecentItems.DEFAULT_MAX_ITEMS;
 
-	private final Preferences prefs;
-	private final Codec<T> codec;
-	private List<T> items;
-	private int maxItems = -1;
+	private final RecentItems<T> list;
 
 	/**
 	 * Reads the list from the preferences node and builds the menu.
@@ -89,26 +77,23 @@ public class RecentItemsMenu<T> extends JMenu {
 	 */
 	public RecentItemsMenu(String title, Preferences prefs, Codec<T> codec) throws IOException {
 		super(title);
-		this.prefs = Objects.requireNonNull(prefs, "prefs");
-		this.codec = Objects.requireNonNull(codec, "codec");
+		list = new RecentItems<>(prefs, codec);
 		buildMenu();
+	}
+
+	/** @return the list the menu shows */
+	public RecentItems<T> getRecentItems() {
+		return list;
 	}
 
 	/** @return the entries, newest first */
 	public List<T> getItems() {
-		return Collections.unmodifiableList(items);
+		return list.getItems();
 	}
 
 	/** Replaces the list. Duplicates are left out. */
-	public void setItems(List<T> list) throws IOException {
-		List<T> ret = new ArrayList<>();
-		for(T item : list) {
-			if( !ret.contains(item) ) {
-				ret.add(item);
-			}
-		}
-		items = ret;
-		store();
+	public void setItems(List<T> items) throws IOException {
+		list.setItems(items);
 		buildMenu();
 	}
 
@@ -117,33 +102,17 @@ public class RecentItemsMenu<T> extends JMenu {
 	 * replaced by {@link #merge(Object, Object)}. The oldest entries over the maximum are dropped.
 	 */
 	public void addItem(T item) throws IOException {
-		int idx = items.indexOf(item);
-		if( idx >=0 ) {
-			item = merge(item, items.remove(idx));
-		}
-		items.add(0, item);
-
-		int mx = getMaxItems();
-		while(items.size()>mx && !items.isEmpty()) {
-			items.remove(items.size()-1);
-		}
-
-		store();
+		list.add(item, this::merge);
 		buildMenu();
 	}
 
 	public int getMaxItems() {
-		if( maxItems < 0 ) {
-			maxItems = prefs.getInt(PREF_MAX_ITEMS, DEFAULT_MAX_ITEMS);
-		}
-		return maxItems;
+		return list.getMaxItems();
 	}
 
 	/** Sets the maximum number of entries. It applies the next time an item is added. */
 	public void setMaxItems(int max) throws IOException {
-		maxItems = max;
-		prefs.putInt(PREF_MAX_ITEMS, max);
-		flush();
+		list.setMaxItems(max);
 	}
 
 	/** @return the text shown for an item. The default is its toString(). */
@@ -188,50 +157,6 @@ public class RecentItemsMenu<T> extends JMenu {
 		JOptionPane.showMessageDialog(this, e, message, JOptionPane.ERROR_MESSAGE);
 	}
 
-	private List<T> read() {
-		List<T> ret = new ArrayList<>();
-		String text = prefs.get(PREF_RECENT_LIST, null);
-		if( text != null ) {
-			for(String line : text.split(NL)) {
-				if( line.isEmpty() ) {
-					continue;
-				}
-				try {
-					T item = codec.decode(line);
-					if( item != null && !ret.contains(item) ) {
-						ret.add(item);
-					}
-				} catch (RuntimeException e) {
-					// skip a malformed line rather than lose the list
-				}
-			}
-		}
-
-		return ret;
-	}
-
-	private void store() throws IOException {
-		StringBuilder buf = new StringBuilder();
-		for(T item : items) {
-			String line = codec.encode(item)+NL;
-			// a preference value is limited in length; the oldest entries that don't fit are dropped
-			if( buf.length()+line.length() > Preferences.MAX_VALUE_LENGTH ) {
-				break;
-			}
-			buf.append(line);
-		}
-		prefs.put(PREF_RECENT_LIST, buf.toString());
-		flush();
-	}
-
-	private void flush() throws IOException {
-		try {
-			prefs.flush();
-		} catch (BackingStoreException e) {
-			throw new IOException("Can't save preferences", e);
-		}
-	}
-
 	private void buildMenu() throws IOException {
 		removeAll();
 		final int mx = getMaxItems();
@@ -253,27 +178,20 @@ public class RecentItemsMenu<T> extends JMenu {
 		item = new JMenuItem("Clear Recent List");
 		item.addActionListener((e)->{
 			try {
-				setItems(new ArrayList<T>());
+				list.clear();
+				buildMenu();
 			} catch (IOException e1) {
 				showError("Can't clear the recent list",e1);
 			}
 		});
 		add(item);
 
-		if( items == null ) {
-			items = read();
-		}
+		list.removeIf(this::isStale);
 
-		boolean changed = items.removeIf(this::isStale);
-
-		for(T entry : items) {
+		for(T entry : list.getItems()) {
 			item = new JMenuItem(getLabel(entry));
 			item.addActionListener((e)->open(entry, e));
 			add(item);
-		}
-
-		if( changed ) {
-			store();
 		}
 	}
 
