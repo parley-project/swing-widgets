@@ -2,7 +2,8 @@
 
 Reusable Swing components: date and time pickers (date, day and time panels, an analog clock,
 modal date/time dialogs and a date/time combo box; Swing has no date or time picker of its own)
-a "recent items" menu, and a way to update a progress monitor from any thread. Each group of components has its own package under
+a "recent items" menu, a way to update a progress monitor from any thread, and a set of
+gradient-styled buttons, dialogs, fields and look-and-feel pieces. Each group of components has its own package under
 `us.bringardner.swing`.
 
 - **Java 11** or later
@@ -32,6 +33,13 @@ replacing that package with `us.bringardner.swing.datetime` in imports.
 | | `DateTimeCombo` | A date/time spinner with a button that opens `DateAndTimeDialog`. |
 | `us.bringardner.swing.menu` | `RecentItemsMenu` | A "Recent ..." menu of any kind of item, saved with `java.util.prefs.Preferences`. |
 | `us.bringardner.swing.progress` | `ProgressMonitorUpdater` | Lets any thread update a Swing `ProgressMonitor`; the changes are made on the event dispatch thread. |
+| `us.bringardner.swing.gradient` | `GradientPanel`, `GradientButton` | A panel painted with a two-color gradient, and a rounded gradient button. |
+| | `GradientColors` | The colors the gradient widgets use (a gold gradient by default); set them before creating widgets. |
+| `us.bringardner.swing.dialog` | `MessageDialog` | Gradient-styled message, warning, error and input dialogs (`showMessageDialog`, `showErrorDialog`, ...). |
+| | `FontDialog`, `SettingsDialog` | Choose a font; a settings dialog with a font chooser. |
+| `us.bringardner.swing.field` | `TextFieldPanel`, `PasswordPanel` | A text field with a prompt shown while it's empty; a password field with a show/hide eye. |
+| `us.bringardner.swing.ui` | `ScrollBarUI`, `TableHeaderUI` | Gradient look for scroll bars and table headers. |
+| | `GlassPane` | A glass pane that blocks input and shows a spinning globe while the application is busy. |
 
 ## Date and time pickers
 

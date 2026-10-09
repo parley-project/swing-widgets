@@ -20,5 +20,11 @@ only names changed.
   (BjlFileSystem's before that), which is now built on it.
 - `us.bringardner.swing.progress.ProgressMonitorUpdater`, which lets any thread update a Swing
   `ProgressMonitor`. It is the code of parley-files' `ProgressMonitorProgress`, which now extends it.
+- Gradient-styled widgets from BjlFileSystemViewer (now parley-files-viewer), which uses them from
+  here: `us.bringardner.swing.gradient` (`GradientPanel`, `GradientButton`, and `GradientColors`, which
+  replaces the colors they read from the viewer), `us.bringardner.swing.dialog` (`MessageDialog`,
+  `FontDialog`, `SettingsDialog`), `us.bringardner.swing.field` (`TextFieldPanel`, `PasswordPanel`)
+  and `us.bringardner.swing.ui` (`ScrollBarUI`, `GlassPane`, and `TableHeaderUI`, formerly
+  `BjlTableHeaderUI`). Their icons are in `/us/bringardner/swing/icons`.
 
 For earlier changes to these classes see the BjlCore changelog.
