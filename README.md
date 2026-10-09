@@ -63,6 +63,29 @@ library because it has no UI and no dependencies, so both toolkits can reach it.
 | `us.bringardner.swing.ui` | `ScrollBarUI`, `TableHeaderUI` | Gradient look for scroll bars and table headers. |
 | | `GlassPane` | A glass pane that blocks input and shows a spinning globe while the application is busy. |
 
+## JavaFX alternatives
+
+What to use in a JavaFX application instead of each component here. Most are built into JavaFX; what
+isn't is in [fx-widgets](https://github.com/tony-bringardner/fx-widgets) or, where noted, not yet
+available.
+
+| swing-widgets | In JavaFX |
+|---|---|
+| `DatePanel`, `DayPanel`, `DateDialog` | `DatePicker` (built in) |
+| `TimePanel`, `Clock`, `TimeDialog` | None: JavaFX has no time picker, and fx-widgets doesn't have one yet |
+| `DateAndTimeDialog`, `DateTimeCombo` | None yet; `DatePicker` covers only the date |
+| `RecentItemsMenu` | fx-widgets' `RecentItemsMenu`, which shares its list with this one |
+| `RecentItems` | The same class: both menus use it |
+| `ProgressMonitorUpdater` | A `Task`: call `updateProgress` and `updateMessage` from any thread, and bind a `ProgressBar` to its `progressProperty()` |
+| `GradientPanel`, `GradientButton`, `GradientColors` | CSS: `-fx-background-color: linear-gradient(...)` and `-fx-background-radius` |
+| `MessageDialog` | `Alert` and `TextInputDialog` |
+| `FontDialog` | None built in (ControlsFX, a separate library, has `FontSelectorDialog`) |
+| `SettingsDialog` | A `Dialog` with your own content |
+| `TextFieldPanel` | `TextField.setPromptText(...)` |
+| `PasswordPanel` | `PasswordField`; there's no built-in show/hide toggle |
+| `ScrollBarUI`, `TableHeaderUI` | CSS (`.scroll-bar`, `.column-header`) |
+| `GlassPane` | A `StackPane` layer over the window's content, holding a `ProgressIndicator` |
+
 ## Date and time pickers
 
 The date and time components work together:
