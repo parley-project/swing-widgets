@@ -14,7 +14,7 @@
 	<description>Reusable Swing components. Includes date and time pickers: date, day and time
 		panels, an analog clock, modal date/time dialogs and a date/time combo box. No dependencies.
 		The date and time pickers were formerly the us.bringardner.core.swing package of BjlCore.</description>
-	<url>https://github.com/tony-bringardner/swing-widgets</url>
+	<url>https://github.com/parley-project/swing-widgets</url>
 	<inceptionYear>1998</inceptionYear>
 
 	<licenses>
@@ -34,15 +34,15 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:https://github.com/tony-bringardner/swing-widgets.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com/tony-bringardner/swing-widgets.git</developerConnection>
-		<url>https://github.com/tony-bringardner/swing-widgets/tree/master</url>
+		<connection>scm:git:https://github.com/parley-project/swing-widgets.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/parley-project/swing-widgets.git</developerConnection>
+		<url>https://github.com/parley-project/swing-widgets/tree/master</url>
 		<tag>HEAD</tag>
 	</scm>
 
 	<issueManagement>
 		<system>GitHub Issues</system>
-		<url>https://github.com/tony-bringardner/swing-widgets/issues</url>
+		<url>https://github.com/parley-project/swing-widgets/issues</url>
 	</issueManagement>
 
 	<properties>
@@ -194,12 +194,12 @@
 		</pluginManagement>
 	</build>
 
-	<!-- GitHub Packages, used by release.sh. Maven Central releases use: mvn -Prelease clean deploy -->
+	<!-- GitHub Packages: mvn clean deploy. Maven Central releases use the release profile: mvn -Prelease clean deploy -->
 	<distributionManagement>
 		<repository>
 			<id>github</id>
-			<name>tony-bringardner</name>
-			<url>https://maven.pkg.github.com/tony-bringardner/swing-widgets</url>
+			<name>parley-project</name>
+			<url>https://maven.pkg.github.com/parley-project/swing-widgets</url>
 		</repository>
 	</distributionManagement>
 

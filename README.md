@@ -27,7 +27,7 @@ It's a library of its own, with no dependencies, for two reasons:
   carried Swing along. Now only applications with a Swing UI need it.
 - **It isn't tied to Parley.** Any Swing application can use it without pulling in Parley.
 
-[fx-widgets](https://github.com/tony-bringardner/fx-widgets) is the JavaFX counterpart, but not a
+[fx-widgets](https://github.com/parley-project/fx-widgets) is the JavaFX counterpart, but not a
 copy: JavaFX already has much of what's here (CSS styling, `Alert`, prompt text, `Task` progress),
 so it only fills JavaFX's own gaps. The recent list behind both menus (`RecentItems`) is in this
 library because it has no UI and no dependencies, so both toolkits can reach it.
@@ -40,7 +40,7 @@ library because it has no UI and no dependencies, so both toolkits can reach it.
 ```xml
 <dependency>
     <groupId>us.bringardner</groupId>
-    <artifactId>swing-widgets</artifactId>
+    <artifactId>bringardner-swing-widgets</artifactId>
     <version>1.0.0</version>
 </dependency>
 ```
@@ -66,7 +66,7 @@ library because it has no UI and no dependencies, so both toolkits can reach it.
 ## JavaFX alternatives
 
 What to use in a JavaFX application instead of each component here. Most are built into JavaFX; what
-isn't is in [fx-widgets](https://github.com/tony-bringardner/fx-widgets) or, where noted, not yet
+isn't is in [fx-widgets](https://github.com/parley-project/fx-widgets) or, where noted, not yet
 available.
 
 | swing-widgets | In JavaFX |
@@ -146,9 +146,9 @@ is none (for example on a CI server), and briefly open windows when there is.
 
 ## Releasing
 
-Set the new version in `pom.xml`, then run `./release.sh`. It checks for GitHub credentials,
-runs `mvn clean deploy` to GitHub Packages, commits any changes, tags `v<version>` and pushes.
-Use `./release.sh -n` for a dry run. See the comments at the top of the script for details.
+Set the new version in `pom.xml`, then `mvn -Prelease clean deploy` publishes to Maven Central
+(it needs a GPG key, and a Central Portal user token in `~/.m2/settings.xml` under the server id
+`central`). Then tag the release (`v<version>`) and push.
 
 ## License
 
