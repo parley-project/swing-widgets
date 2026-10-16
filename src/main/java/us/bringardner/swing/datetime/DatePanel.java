@@ -37,7 +37,6 @@ import java.beans.PropertyChangeListener;
 import java.util.Calendar;
 import java.util.Date;
 
-import javax.swing.JFrame;
 import javax.swing.JSpinner;
 
 /**

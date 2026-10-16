@@ -7,7 +7,7 @@
 	     Maven Central release profile below are copied from parley-parent. -->
 	<groupId>us.bringardner</groupId>
 	<artifactId>bringardner-swing-widgets</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
 	<name>Swing Widgets</name>
