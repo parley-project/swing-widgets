@@ -194,7 +194,7 @@
 		</pluginManagement>
 	</build>
 
-	<!-- GitHub Packages (release.sh -g / -G). Maven Central releases use the release profile: mvn -Prelease clean deploy -->
+	<!-- GitHub Packages: mvn clean deploy. Maven Central releases use the release profile: mvn -Prelease clean deploy -->
 	<distributionManagement>
 		<repository>
 			<id>github</id>

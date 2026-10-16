@@ -146,10 +146,9 @@ is none (for example on a CI server), and briefly open windows when there is.
 
 ## Releasing
 
-Set the new version in `pom.xml`, then run `../parley-build/release.sh` (the release script shared
-with the Parley projects). It publishes to Maven Central with `mvn -Prelease clean deploy`, then
-tags the release (`v<version>`) and pushes; finish by pressing Publish on central.sonatype.com.
-Use `../parley-build/release.sh -n` for a dry run.
+Set the new version in `pom.xml`, then `mvn -Prelease clean deploy` publishes to Maven Central
+(it needs a GPG key, and a Central Portal user token in `~/.m2/settings.xml` under the server id
+`central`). Then tag the release (`v<version>`) and push.
 
 ## License
 
