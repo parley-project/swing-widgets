@@ -35,15 +35,12 @@ import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.awt.font.TextAttribute;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.text.AttributedString;
 import java.util.Calendar;
 
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 /**
