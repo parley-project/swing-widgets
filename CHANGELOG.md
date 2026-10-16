@@ -1,6 +1,6 @@
 # Changelog
 
-## swing-widgets 1.0.0 (unreleased)
+## swing-widgets 1.0.0 (2026-10-16)
 
 The Swing date and time components are now in their own library, split out of BjlCore / parley-core
 so the Parley protocol libraries no longer bring in Swing. The code is the same as BjlCore 1.3.1;
