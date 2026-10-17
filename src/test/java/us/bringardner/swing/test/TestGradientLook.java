@@ -153,4 +153,13 @@ public class TestGradientLook {
 		assertSame(content, ((GradientPanel) dialog.getContentPane()).getComponent(0));
 		dialog.dispose();
 	}
+
+	@Test
+	public void followAppliesTheLookOnceItIsInstalled() {
+		GradientLook.install();
+		javax.swing.JDialog dialog = new javax.swing.JDialog();
+		assertSame(dialog, GradientLook.follow(dialog));
+		assertTrue(dialog.getContentPane() instanceof GradientPanel);
+		dialog.dispose();
+	}
 }

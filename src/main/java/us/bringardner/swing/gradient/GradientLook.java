@@ -159,6 +159,17 @@ public final class GradientLook {
 		return window;
 	}
 
+	/**
+	 * For a library's windows: puts the window on the gradient if the application installed the
+	 * gradient look, and leaves it alone otherwise. Call it once the window's content is built.
+	 *
+	 * @param window a JFrame, JDialog or other root pane container
+	 * @return the window
+	 */
+	public static <W extends RootPaneContainer> W follow(W window) {
+		return installed ? apply(window) : window;
+	}
+
 	/** seeThrough every scroll pane in a container whose view is a tree, table or list. */
 	private static void seeThroughViews(Container container) {
 		for(Component c : container.getComponents()) {

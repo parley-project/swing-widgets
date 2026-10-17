@@ -155,7 +155,8 @@ public static void main(String[] args) {
 macOS, Metal elsewhere); set `GradientColors` first for other colors. `apply(window)` puts a frame's
 or dialog's content on a `GradientPanel` and makes its layout panels, trees, tables and lists
 see-through, leaving controls and text areas alone. For finer control, `seeThrough(scrollPane)` and
-`seeThroughPanels(container)` do those parts on their own. For JavaFX, use
+`seeThroughPanels(container)` do those parts on their own. A library's own windows use `follow(window)` instead: it applies
+the look only if the application installed it. For JavaFX, use
 fx-widgets' `GradientLook`, which has the same colors.
 
 ## Building and testing
