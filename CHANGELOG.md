@@ -9,7 +9,8 @@
   scroll bars, see-through trees and tables, the dark color for grid lines, the table header and
   the tree selection, and the gold tree and sort arrows); `seeThrough(scrollPane)` lets the gradient
   show through a scroll pane and its tree or table; `seeThroughPanels(container)` does the same for
-  plain layout panels.
+  plain layout panels; `apply(window)` does it all for a frame or dialog, putting its content on a
+  `GradientPanel`.
 - The tree and sort arrow icons, and the tree node icon, from parley-files-viewer, in
   `us/bringardner/swing/icons`.
 

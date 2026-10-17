@@ -123,4 +123,34 @@ public class TestGradientLook {
 		assertTrue(text.isOpaque(), "a text area is left alone");
 		assertTrue(gradient.isOpaque(), "a gradient panel is left alone");
 	}
+
+	@Test
+	public void applyPutsAWindowsContentOnTheGradient() {
+		GradientLook.install();
+		javax.swing.JDialog dialog = new javax.swing.JDialog();
+		JPanel content = new JPanel(new BorderLayout());
+		javax.swing.border.Border margin = new javax.swing.border.EmptyBorder(5, 5, 5, 5);
+		content.setBorder(margin);
+		JTable table = new JTable(new Object[][] {{"a"}}, new Object[] {"One"});
+		JScrollPane sp = new JScrollPane(table);
+		JTextArea text = new JTextArea();
+		content.add(sp, BorderLayout.CENTER);
+		content.add(new JScrollPane(text), BorderLayout.SOUTH);
+		dialog.setContentPane(content);
+
+		assertSame(dialog, GradientLook.apply(dialog));
+
+		assertTrue(dialog.getContentPane() instanceof GradientPanel);
+		assertSame(content, ((GradientPanel) dialog.getContentPane()).getComponent(0));
+		assertSame(margin, ((GradientPanel) dialog.getContentPane()).getBorder(), "the margin moves outside");
+		assertEquals(null, content.getBorder());
+		assertFalse(content.isOpaque());
+		assertFalse(table.isOpaque(), "a table shows the gradient");
+		assertTrue(text.isOpaque(), "a text area is left alone");
+
+		// a second call doesn't wrap it again
+		GradientLook.apply(dialog);
+		assertSame(content, ((GradientPanel) dialog.getContentPane()).getComponent(0));
+		dialog.dispose();
+	}
 }

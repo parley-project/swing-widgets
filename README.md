@@ -144,16 +144,18 @@ public static void main(String[] args) {
     GradientLook.install();                  // before any window is made
     EventQueue.invokeLater(() -> {
         JFrame frame = new JFrame("My app");
-        frame.setContentPane(new GradientPanel(GradientPanel.DIAGONAL_RIGHT));
-        frame.add(GradientLook.seeThrough(new JScrollPane(table)));  // the gradient shows through
-        ...
+        ...                                  // build the window as usual
+        GradientLook.apply(frame);           // then put it on the gradient
+        frame.setVisible(true);
     });
 }
 ```
 
 `install()` sets UIManager defaults, so it works with whatever look and feel is in use (Aqua on
-macOS, Metal elsewhere); set `GradientColors` first for other colors. `seeThroughPanels(container)`
-makes plain layout panels see-through too, leaving controls and text areas alone. For JavaFX, use
+macOS, Metal elsewhere); set `GradientColors` first for other colors. `apply(window)` puts a frame's
+or dialog's content on a `GradientPanel` and makes its layout panels, trees, tables and lists
+see-through, leaving controls and text areas alone. For finer control, `seeThrough(scrollPane)` and
+`seeThroughPanels(container)` do those parts on their own. For JavaFX, use
 fx-widgets' `GradientLook`, which has the same colors.
 
 ## Building and testing

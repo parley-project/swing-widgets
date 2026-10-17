@@ -22,6 +22,7 @@
  */
 package us.bringardner.swing.gradient;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -31,6 +32,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
+import javax.swing.RootPaneContainer;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.plaf.ColorUIResource;
@@ -128,6 +130,47 @@ public final class GradientLook {
 		if( header != null ) {
 			header.setBackground(GradientColors.getEnd());
 			header.setOpaque(false);
+		}
+	}
+
+	/**
+	 * Puts a window on the gradient: its content goes inside a {@link GradientPanel}, its plain
+	 * layout panels and split panes become see-through, and so do its trees, tables and lists
+	 * (with {@link #seeThrough(JScrollPane)}). Call it once the window's content is built.
+	 *
+	 * @param window a JFrame, JDialog or other root pane container
+	 * @return the window
+	 */
+	public static <W extends RootPaneContainer> W apply(W window) {
+		Container content = window.getContentPane();
+		if( !(content instanceof GradientPanel) ) {
+			GradientPanel gradient = new GradientPanel(GradientPanel.DIAGONAL_RIGHT);
+			gradient.setLayout(new BorderLayout());
+			if( content instanceof JComponent ) {
+				// keep the border (often the window's margin) on the outside
+				gradient.setBorder(((JComponent) content).getBorder());
+				((JComponent) content).setBorder(null);
+			}
+			gradient.add(content, BorderLayout.CENTER);
+			window.setContentPane(gradient);
+		}
+		seeThroughPanels(content);
+		seeThroughViews(content);
+		return window;
+	}
+
+	/** seeThrough every scroll pane in a container whose view is a tree, table or list. */
+	private static void seeThroughViews(Container container) {
+		for(Component c : container.getComponents()) {
+			if( c instanceof JScrollPane ) {
+				Component view = ((JScrollPane) c).getViewport().getView();
+				if( view instanceof javax.swing.JTable || view instanceof javax.swing.JTree
+						|| view instanceof javax.swing.JList ) {
+					seeThrough((JScrollPane) c);
+				}
+			} else if( c instanceof Container ) {
+				seeThroughViews((Container) c);
+			}
 		}
 	}
 
