@@ -14,6 +14,20 @@
   library's own windows.
 - The tree and sort arrow icons, and the tree node icon, from parley-files-viewer, in
   `us/bringardner/swing/icons`.
+- `us.bringardner.swing.gradient.Appearance`: the font and color scheme a user chooses, with
+  named schemes (`SCHEMES`: Gold, Copper, Sage, Ocean, Slate, Plum), `Scheme.fromColor` to make a
+  scheme from any one color, `load`/`save` in `java.util.prefs.Preferences` (the font keys are the
+  ones parley-files-viewer already uses, so saved fonts carry over), and `apply()`, which updates the
+  windows already open. `GradientLook.install(prefs)` installs the look with the saved choice.
+
+### Changed
+
+- `SettingsDialog` works now: it was a sketch whose OK did nothing, whose colors were never kept and
+  whose font change took effect even on Cancel. It shows the font with Change... and Use the
+  standard font, the color schemes as swatches with a Custom... that makes one from a single color
+  (instead of "Color 1" and "Color 2"), a preview, and Reset to defaults. OK applies and, given a
+  preferences node, saves; Cancel changes nothing. New: `SettingsDialog(Preferences)`,
+  `SettingsDialog(Window, Preferences)` and `showDialog(Window, Preferences)`.
 
 ## swing-widgets 1.0.0 (2026-10-16)
 

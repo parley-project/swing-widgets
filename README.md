@@ -59,7 +59,7 @@ library because it has no UI and no dependencies, so both toolkits can reach it.
 | | `GradientColors` | The colors the gradient widgets use (a gold gradient by default); set them before creating widgets. |
 | | `GradientLook` | The whole gradient look in one call, as parley-files-viewer has it: gradient panels and scroll bars, see-through trees and tables, gold tree and sort arrows. |
 | `us.bringardner.swing.dialog` | `MessageDialog` | Gradient-styled message, warning, error and input dialogs (`showMessageDialog`, `showErrorDialog`, ...). |
-| | `FontDialog`, `SettingsDialog` | Choose a font; a settings dialog with a font chooser. |
+| | `FontDialog`, `SettingsDialog` | Choose a font; the appearance settings (font and color scheme, with a preview), saved in preferences. |
 | `us.bringardner.swing.field` | `TextFieldPanel`, `PasswordPanel` | A text field with a prompt shown while it's empty; a password field with a show/hide eye. |
 | `us.bringardner.swing.ui` | `ScrollBarUI`, `TableHeaderUI` | Gradient look for scroll bars and table headers. |
 | | `GlassPane` | A glass pane that blocks input and shows a spinning globe while the application is busy. |
@@ -158,6 +158,22 @@ see-through, leaving controls and text areas alone. For finer control, `seeThrou
 `seeThroughPanels(container)` do those parts on their own. A library's own windows use `follow(window)` instead: it applies
 the look only if the application installed it. For JavaFX, use
 fx-widgets' `GradientLook`, which has the same colors.
+
+### Letting users choose the font and colors
+
+`SettingsDialog` is the appearance settings: the font, and a color scheme chosen from named ones
+(Gold, Copper, Sage, Ocean, Slate, Plum) or made from any one color, with a preview. OK puts the
+choice into effect in every open window and saves it; Cancel changes nothing. Install the look with
+the saved choice at start-up:
+
+```java
+Preferences prefs = Preferences.userNodeForPackage(MyApp.class);
+GradientLook.install(prefs);                       // instead of install()
+...
+SettingsDialog.showDialog(frame, prefs);           // from a Preferences menu item
+```
+
+`Appearance` is the choice itself, to load, save or apply without the dialog.
 
 ## Building and testing
 

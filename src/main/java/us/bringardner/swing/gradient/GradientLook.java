@@ -106,6 +106,21 @@ public final class GradientLook {
 	}
 
 	/**
+	 * Installs the gradient look with the appearance the user saved (with {@code SettingsDialog}):
+	 * their colors and font, or the defaults for what they haven't chosen. Call it once, before
+	 * creating any windows, instead of {@link #install()}.
+	 *
+	 * @param prefs the application's preferences node, or null for the defaults
+	 * @return the appearance now in effect
+	 */
+	public static Appearance install(java.util.prefs.Preferences prefs) {
+		Appearance a = Appearance.load(prefs);
+		a.apply();
+		install();
+		return a;
+	}
+
+	/**
 	 * Lets the gradient behind a scroll pane show through it and its tree, table or list, and gives
 	 * a table's header the dark color, as in parley-files-viewer.
 	 *
