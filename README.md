@@ -57,6 +57,7 @@ library because it has no UI and no dependencies, so both toolkits can reach it.
 | `us.bringardner.swing.progress` | `ProgressMonitorUpdater` | Lets any thread update a Swing `ProgressMonitor`; the changes are made on the event dispatch thread. |
 | `us.bringardner.swing.gradient` | `GradientPanel`, `GradientButton` | A panel painted with a two-color gradient, and a rounded gradient button. |
 | | `GradientColors` | The colors the gradient widgets use (a gold gradient by default); set them before creating widgets. |
+| | `GradientLook` | The whole gradient look in one call, as parley-files-viewer has it: gradient panels and scroll bars, see-through trees and tables, gold tree and sort arrows. |
 | `us.bringardner.swing.dialog` | `MessageDialog` | Gradient-styled message, warning, error and input dialogs (`showMessageDialog`, `showErrorDialog`, ...). |
 | | `FontDialog`, `SettingsDialog` | Choose a font; a settings dialog with a font chooser. |
 | `us.bringardner.swing.field` | `TextFieldPanel`, `PasswordPanel` | A text field with a prompt shown while it's empty; a password field with a show/hide eye. |
@@ -77,6 +78,7 @@ available.
 | `RecentItemsMenu` | fx-widgets' `RecentItemsMenu`, which shares its list with this one |
 | `RecentItems` | The same class: both menus use it |
 | `ProgressMonitorUpdater` | A `Task`: call `updateProgress` and `updateMessage` from any thread, and bind a `ProgressBar` to its `progressProperty()` |
+| `GradientLook` | fx-widgets' `GradientLook`: a stylesheet with the same look |
 | `GradientPanel`, `GradientButton`, `GradientColors` | CSS: `-fx-background-color: linear-gradient(...)` and `-fx-background-radius` |
 | `MessageDialog` | `Alert` and `TextInputDialog` |
 | `FontDialog` | None built in (ControlsFX, a separate library, has `FontSelectorDialog`) |
@@ -131,6 +133,28 @@ and one item per entry. Choosing an entry moves it to the top and calls the menu
 ActionListeners. Subclasses can override `getLabel` (the text shown), `isStale` (drop entries that
 no longer exist), `openItem` (what the event's source is, or null to cancel) and `merge` (keep
 state from the entry an item replaces).
+
+## The gradient look
+
+parley-files-viewer's look (a diagonal gradient from light to dark gold behind everything, with trees
+and tables you see it through) for any Swing application:
+
+```java
+public static void main(String[] args) {
+    GradientLook.install();                  // before any window is made
+    EventQueue.invokeLater(() -> {
+        JFrame frame = new JFrame("My app");
+        frame.setContentPane(new GradientPanel(GradientPanel.DIAGONAL_RIGHT));
+        frame.add(GradientLook.seeThrough(new JScrollPane(table)));  // the gradient shows through
+        ...
+    });
+}
+```
+
+`install()` sets UIManager defaults, so it works with whatever look and feel is in use (Aqua on
+macOS, Metal elsewhere); set `GradientColors` first for other colors. `seeThroughPanels(container)`
+makes plain layout panels see-through too, leaving controls and text areas alone. For JavaFX, use
+fx-widgets' `GradientLook`, which has the same colors.
 
 ## Building and testing
 

@@ -1,5 +1,18 @@
 # Changelog
 
+## swing-widgets 1.1.0 (unreleased)
+
+### Added
+
+- `us.bringardner.swing.gradient.GradientLook`: parley-files-viewer's look in one call, so every
+  Parley application can have it. `install()` sets the UIManager defaults (gradient panels and
+  scroll bars, see-through trees and tables, the dark color for grid lines, the table header and
+  the tree selection, and the gold tree and sort arrows); `seeThrough(scrollPane)` lets the gradient
+  show through a scroll pane and its tree or table; `seeThroughPanels(container)` does the same for
+  plain layout panels.
+- The tree and sort arrow icons, and the tree node icon, from parley-files-viewer, in
+  `us/bringardner/swing/icons`.
+
 ## swing-widgets 1.0.0 (2026-10-16)
 
 The Swing date and time components are now in their own library, split out of BjlCore / parley-core
