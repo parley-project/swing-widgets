@@ -66,6 +66,8 @@ public class TestThemeDesign {
 		static final String ID = "test-app.editor";
 		javax.swing.JTextField field;
 		Runnable listener;
+		/** The theme the page was last told of. */
+		Theme heard;
 
 		@Override
 		public String getId() {
@@ -104,6 +106,11 @@ public class TestThemeDesign {
 				@Override
 				public void setChangeListener(Runnable l) {
 					listener = l;
+				}
+
+				@Override
+				public void themeChanged(Theme theme) {
+					heard = theme;
 				}
 			};
 		}
@@ -147,6 +154,21 @@ public class TestThemeDesign {
 		assertEquals("#123456", t.getExtras().get("test-app.editor.color"));
 		assertEquals("v", t.getExtras().get("other.k"), "the others are kept");
 		assertEquals(java.util.Map.of("color", "#FFFFFF"), t.withValues(x, java.util.Map.of()).values(x), "replaced: defaults again");
+	}
+
+	@Test
+	public void aPageHearsOfTheThemesColors() throws Exception {
+		TestExtension x = new TestExtension();
+		ThemeExtensions.register(x);
+		try {
+			ThemeDesigner d = new ThemeDesigner(null, Theme.GOLD);
+			assertEquals(Theme.GOLD.getStart(), x.heard.getStart(), "the theme started from");
+			d.setColor(0, new java.awt.Color(0x123456));
+			assertEquals(new java.awt.Color(0x123456), x.heard.getStart(), "a color changed");
+			d.cancel();
+		} finally {
+			ThemeExtensions.unregister(TestExtension.ID);
+		}
 	}
 
 	@Test

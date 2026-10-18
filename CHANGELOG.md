@@ -4,6 +4,9 @@
 
 ### Added
 
+- `ThemeExtension.Page.themeChanged(Theme)`: the theme designer tells an application's page of
+  the theme as it changes (a color, say), so settings that follow the theme's colors can show them.
+  It does nothing by default.
 - `us.bringardner.swing.gradient.FolderIcon`: a folder in the current theme's colors (its light color
   with its accent around, like a manila folder; a dark theme's is its accent, darkened), closed,
   open or not readable, in any size. It takes the colors as it's painted, so it follows a theme

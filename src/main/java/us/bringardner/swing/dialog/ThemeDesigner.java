@@ -524,6 +524,9 @@ public class ThemeDesigner extends JDialog {
 		}
 		Theme t = getTheme();
 		preview.show(t, null);
+		for(ThemeExtension.Page p : pages) {
+			p.themeChanged(t);
+		}
 		for(int i = 0; i < CHECKS.length; i++) {
 			double ratio = Theme.contrast(colors[CHECKS[i][0]], colors[CHECKS[i][1]]);
 			boolean ok = ratio * 10 >= CHECKS[i][2];
