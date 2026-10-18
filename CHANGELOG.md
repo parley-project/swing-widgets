@@ -4,6 +4,8 @@
 
 ### Added
 
+- `us.bringardner.swing.gradient.FileIcon`: a file to go with `FolderIcon`, a page with a folded
+  corner in the theme's field color and accent, crossed out in red when it can't be read.
 - Applications' own tabs in Settings: register a `us.bringardner.swing.dialog.SettingsPage` with
   `SettingsPages.register(id, factory)` and the Settings dialog has tabs, Appearance first, titled
   "Settings". OK asks each page for a problem first (which keeps the dialog open, on that page) and
