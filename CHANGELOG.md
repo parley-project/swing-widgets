@@ -4,6 +4,12 @@
 
 ### Added
 
+- Buttons in the theme: the gradient look (`GradientLook.install()`) draws every `JButton` with text in
+  the theme's colors, as the JavaFX look does (`us.bringardner.swing.ui.GradientButtonUI`), with the
+  default button bold. Before, they were the look and feel's own: on macOS, the default button (OK,
+  Save as new theme) was the system accent color, and white when the window wasn't in front. A button
+  with only an icon, one the look and feel makes for its own controls, or one with an Aqua button type
+  keeps the look and feel's; so does one with the client property `Gradient.themed` set to false.
 - `ThemeExtension.Page.themeChanged(Theme)`: the theme designer tells an application's page of
   the theme as it changes (a color, say), so settings that follow the theme's colors can show them.
   It does nothing by default.

@@ -28,6 +28,8 @@ import us.bringardner.swing.datetime.test.RunOnEdt;
 import us.bringardner.swing.gradient.GradientColors;
 import us.bringardner.swing.gradient.GradientLook;
 import us.bringardner.swing.gradient.GradientPanel;
+import us.bringardner.swing.gradient.Theme;
+import us.bringardner.swing.ui.GradientButtonUI;
 import us.bringardner.swing.ui.ScrollBarUI;
 
 @ExtendWith(RunOnEdt.class)
@@ -52,6 +54,63 @@ public class TestGradientLook {
 		assertEquals(end, UIManager.getColor("Table.gridColor"));
 		assertEquals(0, UIManager.getColor("Table.background").getAlpha());
 		assertEquals(end, UIManager.getColor("TableHeader.background"));
+	}
+
+	@Test
+	public void buttonsWithTextAreInTheTheme() {
+		Theme old = Theme.current();
+		try {
+			Theme.setCurrent(Theme.named("Ocean"));
+			GradientLook.install();
+			assertEquals(GradientButtonUI.class.getName(), UIManager.get("ButtonUI"));
+
+			javax.swing.JButton ok = new javax.swing.JButton("OK");
+			assertTrue(ok.getUI() instanceof GradientButtonUI);
+			assertFalse(ok.isOpaque());
+			// an icon-only button (a toolbar's) and one asked not to be keep the look and feel's
+			javax.swing.JButton tool = new javax.swing.JButton(new ImageIcon(new java.awt.image.BufferedImage(16, 16,
+					java.awt.image.BufferedImage.TYPE_INT_ARGB)));
+			assertFalse(tool.getUI() instanceof GradientButtonUI);
+			javax.swing.JButton plain = new javax.swing.JButton("Plain");
+			plain.putClientProperty(GradientButtonUI.THEMED, Boolean.FALSE);
+			plain.updateUI();
+			assertFalse(plain.getUI() instanceof GradientButtonUI);
+			// made with no text and given an icon afterwards: a toolbar button after all
+			javax.swing.JButton later = new javax.swing.JButton("");
+			assertTrue(later.getUI() instanceof GradientButtonUI);
+			later.setIcon(tool.getIcon());
+			assertFalse(later.getUI() instanceof GradientButtonUI);
+			later.setText("Run");
+			assertTrue(later.getUI() instanceof GradientButtonUI, "text again: themed again");
+
+			// painted in the theme's colors, the default button too (Aqua paints it the macOS accent)
+			javax.swing.JDialog d = new javax.swing.JDialog();
+			JPanel p = new JPanel();
+			p.add(ok);
+			d.setContentPane(p);
+			d.getRootPane().setDefaultButton(ok);
+			d.pack();
+			assertTrue(ok.isDefaultButton());
+			java.awt.image.BufferedImage img = new java.awt.image.BufferedImage(ok.getWidth(), ok.getHeight(),
+					java.awt.image.BufferedImage.TYPE_INT_ARGB);
+			java.awt.Graphics2D g = img.createGraphics();
+			ok.paint(g);
+			g.dispose();
+			Color middle = new Color(img.getRGB(3, ok.getHeight() / 2), true);
+			Theme t = Theme.current();
+			assertTrue(near(middle, t.getEnd(), 60), "the dark end at the left: " + middle);
+			Color edge = new Color(img.getRGB(ok.getWidth() / 2, 0), true);
+			assertTrue(edge.getAlpha() == 0 || near(edge, t.getEnd(), 60), "outlined in the dark end: " + edge);
+			d.dispose();
+		} finally {
+			Theme.setCurrent(old);
+			GradientLook.install();
+		}
+	}
+
+	private static boolean near(Color a, Color b, int by) {
+		return Math.abs(a.getRed() - b.getRed()) + Math.abs(a.getGreen() - b.getGreen())
+				+ Math.abs(a.getBlue() - b.getBlue()) <= by;
 	}
 
 	@Test

@@ -38,6 +38,7 @@ import javax.swing.UIManager;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.IconUIResource;
 
+import us.bringardner.swing.ui.GradientButtonUI;
 import us.bringardner.swing.ui.ScrollBarUI;
 
 /**
@@ -82,6 +83,9 @@ public final class GradientLook {
 		put(d, "Panel.foreground", t.getEnd());
 
 		d.put("ScrollBarUI", ScrollBarUI.class.getCanonicalName());
+		// buttons with text in the theme's colors, not the look and feel's (Aqua's default button is
+		// the macOS accent color); icon-only buttons keep the look and feel's
+		d.put("ButtonUI", GradientButtonUI.class.getName());
 		put(d, "ScrollBar.track", t.getStart());
 		put(d, "ScrollBar.thumb", t.getAccent());
 
