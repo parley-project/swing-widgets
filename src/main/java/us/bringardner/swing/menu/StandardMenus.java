@@ -95,8 +95,14 @@ public class StandardMenus {
 		}
 	}
 
-	/** The platform's shortcut key: ⌘ on macOS, Ctrl elsewhere. */
+	/**
+	 * The platform's shortcut key: ⌘ on macOS, Ctrl elsewhere. Headless (a test with no display) the
+	 * toolkit can't say, so it is worked out from the platform.
+	 */
 	public static int shortcut() {
+		if( java.awt.GraphicsEnvironment.isHeadless() ) {
+			return isMac() ? java.awt.event.InputEvent.META_DOWN_MASK : java.awt.event.InputEvent.CTRL_DOWN_MASK;
+		}
 		return Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 	}
 
