@@ -4,6 +4,10 @@
 
 ### Added
 
+- `us.bringardner.swing.gradient.FolderIcon`: a folder in the current theme's colors (its light color
+  with its accent around, like a manila folder; a dark theme's is its accent, darkened), closed,
+  open or not readable, in any size. It takes the colors as it's painted, so it follows a theme
+  chosen later.
 - `us.bringardner.swing.gradient.MacAppearance`: macOS title bars and native controls dark for a
   dark theme, light for a light one, as soon as the theme changes. `Appearance.apply()` calls it,
   so changing to or from a dark theme in Settings no longer needs a restart on macOS. It uses JNA,
