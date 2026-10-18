@@ -58,6 +58,7 @@ library because it has no UI and no dependencies, so both toolkits can reach it.
 | `us.bringardner.swing.progress` | `ProgressMonitorUpdater` | Lets any thread update a Swing `ProgressMonitor`; the changes are made on the event dispatch thread. |
 | `us.bringardner.swing.gradient` | `GradientPanel`, `GradientButton` | A panel painted with a two-color gradient, and a rounded gradient button. |
 | | `GradientColors` | The colors the gradient widgets use (a gold gradient by default); set them before creating widgets. |
+| | `MacAppearance` | macOS title bars dark or light to go with the theme, at any time (JNA, optional). |
 | | `Theme`, `Appearance` | The themes (Gold, Dark, Light, Copper, Sage, Ocean, Slate, Plum, or one made from any color); the theme and font a user chose. |
 | | `GradientLook` | The whole gradient look in one call, as parley-files-viewer has it: gradient panels and scroll bars, see-through trees and tables, gold tree and sort arrows. |
 | `us.bringardner.swing.dialog` | `MessageDialog` | Gradient-styled message, warning, error and input dialogs (`showMessageDialog`, `showErrorDialog`, ...). |

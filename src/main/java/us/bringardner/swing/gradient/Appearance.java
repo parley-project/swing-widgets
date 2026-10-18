@@ -140,6 +140,20 @@ public final class Appearance {
 	public void apply() {
 		Theme old = Theme.current();
 		Theme.setCurrent(theme);
+		// macOS title bars and native controls, dark or not, now rather than at the next start
+		if( old.isDark() != theme.isDark() && MacAppearance.follow(theme) ) {
+			// AppKit changes it a moment later: the native parts are painted again then
+			javax.swing.Timer later = new javax.swing.Timer(300, e->{
+				for(Window w : Window.getWindows()) {
+					if( w.isDisplayable() ) {
+						SwingUtilities.updateComponentTreeUI(w);
+						w.repaint();
+					}
+				}
+			});
+			later.setRepeats(false);
+			later.start();
+		}
 		if( GradientLook.isInstalled() ) {
 			GradientLook.install();
 		}

@@ -210,6 +210,14 @@
 	</distributionManagement>
 
 	<dependencies>
+		<!-- MacAppearance: dark macOS title bars when the theme changes, through the Objective-C
+		     runtime. Optional: an application without JNA keeps the appearance it started with. -->
+		<dependency>
+			<groupId>net.java.dev.jna</groupId>
+			<artifactId>jna</artifactId>
+			<version>5.19.1</version>
+			<optional>true</optional>
+		</dependency>
 		<!-- junit-jupiter includes the API (to compile tests) and the engine (to run them) -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>

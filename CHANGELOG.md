@@ -4,6 +4,10 @@
 
 ### Added
 
+- `us.bringardner.swing.gradient.MacAppearance`: macOS title bars and native controls dark for a
+  dark theme, light for a light one, as soon as the theme changes. `Appearance.apply()` calls it,
+  so changing to or from a dark theme in Settings no longer needs a restart on macOS. It uses JNA,
+  an optional dependency: without JNA the appearance stays as the application started.
 - `us.bringardner.swing.menu.StandardMenus`: one menu layout for every Parley application. File,
   Edit, View, the application's own menus, Window and Help, in that order. On macOS, About,
   Settings… (⌘,) and Quit (⌘Q) go in the application menu and the menu bar is at the top of the
