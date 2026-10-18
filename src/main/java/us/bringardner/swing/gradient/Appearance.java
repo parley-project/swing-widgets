@@ -27,7 +27,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
 import java.awt.Window;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -159,7 +158,9 @@ public final class Appearance {
 		UIDefaults defaults = UIManager.getDefaults();
 		if( lookFonts == null ) {
 			lookFonts = new HashMap<>();
-			for(Object key : new ArrayList<>(defaults.keySet())) {
+			// keys(), not keySet(): before Java 12 or so, keySet() of UIManager's defaults has only the
+			// application's own keys, none of the look and feel's, so no font would change
+			for(Object key : java.util.Collections.list(defaults.keys())) {
 				if( key.toString().toLowerCase().endsWith("font") ) {
 					lookFonts.put(key, defaults.get(key));
 				}

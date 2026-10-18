@@ -170,7 +170,8 @@ public final class GradientLook {
 			return;
 		}
 		lookValues = new java.util.HashMap<>();
-		for(Object key : new java.util.ArrayList<>(d.keySet())) {
+		// keys(), not keySet(): on older Java, keySet() of UIManager's defaults misses the look's keys
+		for(Object key : java.util.Collections.list(d.keys())) {
 			lookValues.put(key, d.get(key));
 		}
 	}
