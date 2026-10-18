@@ -37,6 +37,11 @@
   new theme. It also edits one of the user's own themes in place, including renaming it.
   `Theme.contrast` is the WCAG contrast ratio it checks with.
 - `ThemePreview`: a small window's worth of any theme, used by the settings dialog and the designer.
+- `ThemeExtension` and `ThemeExtensions`: an application's own part of a theme (such as a script
+  editor's syntax colors), with a tab in the theme designer. A theme keeps applications' settings as
+  extra `<id>.<key>` lines in its file (`Theme.getExtras()`, `withExtras`, `values`, `withValues`,
+  `hasValues`); a new theme starts with its parent's, and themes without their own get the
+  extension's defaults.
 - `SettingsDialog`: New theme..., Edit theme... and Delete theme (the last two for the user's own
   themes), and the user's themes among the cards.
 

@@ -27,6 +27,8 @@ import us.bringardner.swing.dialog.ThemeDesigner;
 import us.bringardner.swing.gradient.Appearance;
 import us.bringardner.swing.gradient.GradientLook;
 import us.bringardner.swing.gradient.Theme;
+import us.bringardner.swing.gradient.ThemeExtension;
+import us.bringardner.swing.gradient.ThemeExtensions;
 
 @ExtendWith(RunOnEdt.class)
 public class TestThemeDesign {
@@ -56,6 +58,164 @@ public class TestThemeDesign {
 			System.setProperty(Theme.USER_THEMES_PROPERTY, oldDir);
 		}
 		Theme.setCurrent(Theme.GOLD);
+		ThemeExtensions.unregister(TestExtension.ID);
+	}
+
+	/** An application's part of a theme, for the tests: one "color" setting, dark or light by default. */
+	static class TestExtension implements ThemeExtension {
+		static final String ID = "test-app.editor";
+		javax.swing.JTextField field;
+		Runnable listener;
+
+		@Override
+		public String getId() {
+			return ID;
+		}
+
+		@Override
+		public String getTitle() {
+			return "Test editor";
+		}
+
+		@Override
+		public java.util.Map<String, String> defaults(Theme theme) {
+			return java.util.Map.of("color", theme.isDark() ? "#000000" : "#FFFFFF");
+		}
+
+		@Override
+		public Page createPage() {
+			field = new javax.swing.JTextField(8);
+			return new Page() {
+				@Override
+				public javax.swing.JComponent getComponent() {
+					return field;
+				}
+
+				@Override
+				public void setValues(java.util.Map<String, String> values, Theme theme) {
+					field.setText(values.get("color"));
+				}
+
+				@Override
+				public java.util.Map<String, String> getValues() {
+					return java.util.Map.of("color", field.getText());
+				}
+
+				@Override
+				public void setChangeListener(Runnable l) {
+					listener = l;
+				}
+			};
+		}
+	}
+
+	@Test
+	public void aThemeKeepsTheApplicationsSettings() throws Exception {
+		Theme t = Theme.GOLD.withExtras(java.util.Map.of("b-app.x", "2", "a-app.y", "one = two"));
+		assertEquals(java.util.Map.of("a-app.y", "one = two", "b-app.x", "2"), t.getExtras());
+		assertTrue(Theme.GOLD.getExtras().isEmpty(), "Gold itself is unchanged");
+		assertFalse(t.equals(Theme.GOLD));
+
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		t.write(out);
+		String text = out.toString(StandardCharsets.UTF_8);
+		assertTrue(text.indexOf("a-app.y") < text.indexOf("b-app.x"), text);
+		Theme back = Theme.read(new ByteArrayInputStream(out.toByteArray()));
+		assertEquals(t, back);
+
+		// kept through copies, and a null takes one out
+		assertEquals(t.getExtras(), t.withName("Other").withDescription("d").getExtras());
+		assertEquals(java.util.Map.of("a-app.y", "one = two"), t.withExtras(java.util.Collections.singletonMap("b-app.x", null)).getExtras());
+		assertThrows(IllegalArgumentException.class, ()->t.withExtras(java.util.Map.of("start", "#000000")));
+		assertThrows(IllegalArgumentException.class, ()->t.withExtras(java.util.Map.of(" ", "x")));
+
+		// and saved with a user theme
+		Theme.saveUserTheme(t.withName("Mine"));
+		assertEquals(t.getExtras(), Theme.named("Mine").getExtras());
+	}
+
+	@Test
+	public void anExtensionsValuesAreTheThemesOrTheDefaults() {
+		TestExtension x = new TestExtension();
+		assertEquals(java.util.Map.of("color", "#FFFFFF"), Theme.GOLD.values(x));
+		assertEquals(java.util.Map.of("color", "#000000"), Theme.DARK.values(x));
+		assertFalse(Theme.GOLD.hasValues(x));
+
+		Theme t = Theme.GOLD.withExtras(java.util.Map.of("other.k", "v")).withValues(x, java.util.Map.of("color", "#123456"));
+		assertTrue(t.hasValues(x));
+		assertEquals(java.util.Map.of("color", "#123456"), t.values(x));
+		assertEquals("#123456", t.getExtras().get("test-app.editor.color"));
+		assertEquals("v", t.getExtras().get("other.k"), "the others are kept");
+		assertEquals(java.util.Map.of("color", "#FFFFFF"), t.withValues(x, java.util.Map.of()).values(x), "replaced: defaults again");
+	}
+
+	@Test
+	public void extensionsAreRegisteredById() {
+		TestExtension x = new TestExtension();
+		ThemeExtensions.register(x);
+		ThemeExtensions.register(new TestExtension());
+		assertEquals(1, ThemeExtensions.all().stream().filter(e->e.getId().equals(TestExtension.ID)).count());
+		ThemeExtensions.unregister(TestExtension.ID);
+		assertTrue(ThemeExtensions.all().stream().noneMatch(e->e.getId().equals(TestExtension.ID)));
+		assertThrows(IllegalArgumentException.class, ()->ThemeExtensions.register(new TestExtension() {
+			@Override
+			public String getId() {
+				return "has space";
+			}
+		}));
+		assertThrows(NullPointerException.class, ()->ThemeExtensions.register(null));
+	}
+
+	@Test
+	public void theDesignerHasAPageForEachExtension() throws Exception {
+		GradientLook.install();
+		TestExtension x = new TestExtension();
+		ThemeExtensions.register(x);
+
+		// from a built-in theme: its defaults
+		ThemeDesigner d = new ThemeDesigner(null, Theme.DARK);
+		assertEquals("#000000", x.field.getText());
+		x.field.setText("#ABCDEF");
+		x.listener.run();
+		d.setThemeName("Night");
+		assertTrue(d.save());
+		assertEquals("#ABCDEF", Theme.named("Night").getExtras().get("test-app.editor.color"));
+
+		// a new theme takes its parent's values
+		ThemeDesigner child = new ThemeDesigner(null, Theme.named("Night"));
+		assertEquals("#ABCDEF", x.field.getText());
+		child.setThemeName("Night owl");
+		assertTrue(child.save());
+		assertEquals("#ABCDEF", Theme.named("Night owl").values(x).get("color"));
+
+		// changing the start: that theme's values
+		ThemeDesigner other = new ThemeDesigner(null, Theme.named("Night"));
+		other.startFrom(Theme.GOLD);
+		assertEquals("#FFFFFF", x.field.getText());
+		other.cancel();
+
+		// editing keeps them, and changes them
+		ThemeDesigner edit = new ThemeDesigner(null, Theme.named("Night owl"), true);
+		assertEquals("#ABCDEF", x.field.getText());
+		x.field.setText("#111111");
+		assertTrue(edit.save());
+		assertEquals("#111111", Theme.named("Night owl").values(x).get("color"));
+		assertEquals("#ABCDEF", Theme.named("Night").values(x).get("color"), "the parent is unchanged");
+	}
+
+	@Test
+	public void settingsOfAnApplicationNotRunningAreKept() throws Exception {
+		GradientLook.install();
+		Theme.saveUserTheme(Theme.GOLD.withName("Shared").withExtras(java.util.Map.of("ide.keywords", "#0000FF")));
+		// designed in an application that doesn't know "ide"
+		ThemeDesigner d = new ThemeDesigner(null, Theme.named("Shared"));
+		d.setThemeName("Shared 2");
+		assertTrue(d.save());
+		assertEquals("#0000FF", Theme.named("Shared 2").getExtras().get("ide.keywords"));
+		ThemeDesigner e = new ThemeDesigner(null, Theme.named("Shared"), true);
+		e.setColor(0, java.awt.Color.white);
+		assertTrue(e.save());
+		assertEquals("#0000FF", Theme.named("Shared").getExtras().get("ide.keywords"));
 	}
 
 	@Test

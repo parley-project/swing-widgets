@@ -36,8 +36,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.TreeMap;
 
 /**
  * A theme: a name and the colors of each part of the gradient look. The gradient runs from
@@ -51,6 +53,11 @@ import java.util.Properties;
  * on swing-widgets offers them. {@link #all()} is both. A theme file is a few {@code key=value}
  * lines ({@link #read}, {@link #write}), so one can be copied to another computer, or into this
  * jar's themes to make it a built-in one.
+ * <p>
+ * A theme can also carry an application's own settings ({@link #getExtras()}): keys of the form
+ * {@code <application>.<name>}, such as a script editor's syntax colors. Applications plug in a page
+ * for them in the theme designer ({@link ThemeExtension}). Every theme keeps them, read, written,
+ * copied and renamed with it, whether or not the application reading it knows what they are.
  * <p>
  * {@link #current()} is the theme in effect: the gradient widgets paint with it, and
  * {@link GradientLook#install()} puts it into the UIManager defaults. {@link Appearance} saves the
@@ -77,6 +84,9 @@ public final class Theme {
 	public static final List<String> KEYS = List.of("start", "end", "text", "field", "fieldText", "selection",
 			"selectionText", "header", "headerText", "accent", "buttonText");
 
+	/** The other keys of the look itself; any other key in a theme file is an extra. */
+	private static final List<String> OWN_KEYS = List.of("name", "description", "dark");
+
 	private final String name;
 	private final Color start;
 	private final Color end;
@@ -93,6 +103,8 @@ public final class Theme {
 	private final Color base;
 	private String description;
 	private boolean userTheme;
+	/** The applications' own settings: key to value, sorted by key. */
+	private Map<String, String> extras = Collections.emptyMap();
 
 	/**
 	 * @param name the name to show the user
@@ -183,8 +195,10 @@ public final class Theme {
 	}
 
 	private Theme withBase(Color base) {
-		return new Theme(name, start, end, text, field, fieldText, selection, selectionText, header, headerText,
+		Theme t = new Theme(name, start, end, text, field, fieldText, selection, selectionText, header, headerText,
 				accent, buttonText, dark, base);
+		t.extras = extras;
+		return t;
 	}
 
 	// ---------------------------------------------------------------- the built-in themes
@@ -386,6 +400,7 @@ public final class Theme {
 		Theme ret = new Theme(name, t.start, t.end, t.text, t.field, t.fieldText, t.selection, t.selectionText,
 				t.header, t.headerText, t.accent, t.buttonText, t.dark, null);
 		ret.description = t.description;
+		ret.extras = t.extras;
 		return ret;
 	}
 
@@ -394,7 +409,7 @@ public final class Theme {
 	/**
 	 * Reads a theme file: {@code key=value} lines (a properties file) with {@code name}, optionally
 	 * {@code description}, {@code dark} (true or false), and a {@code #RRGGBB} color for each of
-	 * {@link #KEYS}.
+	 * {@link #KEYS}. Any other key is an application's own ({@link #getExtras()}).
 	 *
 	 * @param in the file
 	 * @return the theme
@@ -415,6 +430,13 @@ public final class Theme {
 		Theme t = of(name.trim(), c, Boolean.parseBoolean(p.getProperty("dark", "false").trim()));
 		String d = p.getProperty("description");
 		t.description = d == null || d.isBlank() ? null : d.trim();
+		Map<String, String> x = new TreeMap<>();
+		for(String k : p.stringPropertyNames()) {
+			if( !OWN_KEYS.contains(k) && !KEYS.contains(k) ) {
+				x.put(k, p.getProperty(k).trim());
+			}
+		}
+		t.extras = Collections.unmodifiableMap(x);
 		return t;
 	}
 
@@ -451,6 +473,12 @@ public final class Theme {
 		Color[] c = colors();
 		for(int i = 0; i < c.length; i++) {
 			b.append(KEYS.get(i)).append('=').append(hex(c[i])).append('\n');
+		}
+		if( !extras.isEmpty() ) {
+			b.append("# The applications' own settings\n");
+			for(Map.Entry<String, String> e : extras.entrySet()) {
+				b.append(line(e.getKey(), e.getValue()));
+			}
 		}
 		out.write(b.toString().getBytes(StandardCharsets.UTF_8));
 		out.flush();
@@ -526,8 +554,84 @@ public final class Theme {
 
 	/** A copy with another gradient; it is no longer one of the built-in themes. */
 	Theme withGradient(Color start, Color end) {
-		return new Theme(CUSTOM, start, end, text, field, fieldText, selection, selectionText, header, headerText,
+		Theme t = new Theme(CUSTOM, start, end, text, field, fieldText, selection, selectionText, header, headerText,
 				accent, buttonText, dark, null);
+		t.extras = extras;
+		return t;
+	}
+
+	// ---------------------------------------------------------------- the applications' own settings
+
+	/** The applications' own settings in this theme: key to value, sorted by key (unmodifiable). */
+	public Map<String, String> getExtras() {
+		return extras;
+	}
+
+	/**
+	 * A copy with these extras put in (a null value takes one out), and the rest kept.
+	 *
+	 * @param values key to value
+	 * @return the copy
+	 */
+	public Theme withExtras(Map<String, String> values) {
+		Map<String, String> x = new TreeMap<>(extras);
+		for(Map.Entry<String, String> e : values.entrySet()) {
+			String k = e.getKey().trim();
+			if( k.isEmpty() || OWN_KEYS.contains(k) || KEYS.contains(k) ) {
+				throw new IllegalArgumentException("\"" + k + "\" isn't a key for an application's setting");
+			}
+			if( e.getValue() == null ) {
+				x.remove(k);
+			} else {
+				x.put(k, e.getValue().trim());
+			}
+		}
+		Theme t = withDescription(description);
+		t.extras = Collections.unmodifiableMap(x);
+		return t;
+	}
+
+	/**
+	 * An extension's settings in this theme: the extension's defaults for it, with the values the
+	 * theme has of its own in their place. The keys are without the extension's prefix.
+	 */
+	public Map<String, String> values(ThemeExtension extension) {
+		Map<String, String> ret = new TreeMap<>(extension.defaults(this));
+		String prefix = extension.getId() + ".";
+		for(Map.Entry<String, String> e : extras.entrySet()) {
+			if( e.getKey().startsWith(prefix) ) {
+				ret.put(e.getKey().substring(prefix.length()), e.getValue());
+			}
+		}
+		return ret;
+	}
+
+	/** True if this theme has any of an extension's settings of its own (not just the defaults). */
+	public boolean hasValues(ThemeExtension extension) {
+		String prefix = extension.getId() + ".";
+		for(String k : extras.keySet()) {
+			if( k.startsWith(prefix) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * A copy with an extension's settings: all of them replaced by these (keys without the prefix).
+	 */
+	public Theme withValues(ThemeExtension extension, Map<String, String> values) {
+		String prefix = extension.getId() + ".";
+		Map<String, String> change = new TreeMap<>();
+		for(String k : extras.keySet()) {
+			if( k.startsWith(prefix) ) {
+				change.put(k, null);
+			}
+		}
+		for(Map.Entry<String, String> e : values.entrySet()) {
+			change.put(prefix + e.getKey(), e.getValue());
+		}
+		return withExtras(change);
 	}
 
 	/** A copy with another name, for saving as a new theme. */
@@ -626,7 +730,7 @@ public final class Theme {
 			return false;
 		}
 		Theme t = (Theme) o;
-		return name.equals(t.name) && sameColors(t) && Objects.equals(base, t.base);
+		return name.equals(t.name) && sameColors(t) && Objects.equals(base, t.base) && extras.equals(t.extras);
 	}
 
 	@Override

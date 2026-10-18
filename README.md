@@ -215,6 +215,27 @@ buttonText=#F5EFDD
 `deleteUserTheme` manage your folder, `Theme.all()` is the built-in themes and then yours, and
 `Theme.contrast` is the WCAG contrast ratio the designer checks with.
 
+### An application's own part of a theme
+
+A theme can carry an application's own settings, such as a script editor's syntax colors, so they
+change with the theme. The application registers a `ThemeExtension` when it starts:
+
+```java
+ThemeExtensions.register(new ThemeExtension() {
+    public String getId() { return "my-app.editor"; }      // the prefix of its keys in a theme file
+    public String getTitle() { return "Script editor"; }    // its tab in the theme designer
+    public Map<String, String> defaults(Theme theme) { ... } // for themes without settings of their own
+    public Page createPage() { ... }                         // the designer's page for them
+});
+```
+
+The designer then shows a tab for it beside the look's colors. A new theme starts with the
+settings of the theme it is made from, and they can be changed there; the built-in themes have
+none of their own, so they get `defaults(theme)`, which may differ for a dark theme. The settings
+are written into the theme file as `my-app.editor.<key>=<value>` lines. `theme.values(extension)`
+is a theme's settings with the defaults filled in. Every application keeps the settings of others
+when it reads, copies or edits a theme, so a theme designed in one application keeps another's.
+
 ## Building and testing
 
 ```bash

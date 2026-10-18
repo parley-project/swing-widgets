@@ -34,7 +34,9 @@ import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -48,6 +50,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
@@ -57,6 +60,8 @@ import javax.swing.event.DocumentListener;
 
 import us.bringardner.swing.gradient.GradientLook;
 import us.bringardner.swing.gradient.Theme;
+import us.bringardner.swing.gradient.ThemeExtension;
+import us.bringardner.swing.gradient.ThemeExtensions;
 
 /**
  * Makes a new theme from an existing one, or changes one of the user's own themes.
@@ -67,6 +72,9 @@ import us.bringardner.swing.gradient.Theme;
  * <p>
  * To edit one of the user's themes ({@link #edit}): change its colors, and its name if wanted, and
  * save the changes over it. The built-in themes can't be edited.
+ * <p>
+ * Applications add pages for their own parts of a theme ({@link ThemeExtension}), such as a script
+ * editor's syntax colors: a new theme starts with those of the theme it is made from.
  * <p>
  * Saved themes are the user's own ({@link Theme#saveUserTheme}), offered by every application built
  * on swing-widgets.
@@ -100,6 +108,11 @@ public class ThemeDesigner extends JDialog {
 	private Theme saved;
 	/** The user's theme being edited, or null when designing a new one. */
 	private final Theme editing;
+	/** The applications' pages, and their extensions. */
+	private final List<ThemeExtension> extensions = ThemeExtensions.all();
+	private final List<ThemeExtension.Page> pages = new ArrayList<>();
+	/** The applications' settings of the theme started from, kept as they are unless a page changes them. */
+	private Map<String, String> startExtras = Map.of();
 
 	/** The choice in "Start from" that makes the starting colors from one color the user picks. */
 	static final String FROM_A_COLOR = "A color...";
@@ -173,7 +186,13 @@ public class ThemeDesigner extends JDialog {
 	/** The theme as the designer has it now (unsaved). */
 	public Theme getTheme() {
 		String n = name.getText().trim();
-		Theme t = Theme.of(n.isEmpty() ? "Untitled" : n, colors.clone(), dark.isSelected());
+		Theme t = Theme.of(n.isEmpty() ? "Untitled" : n, colors.clone(), dark.isSelected()).withExtras(startExtras);
+		for(int i = 0; i < pages.size(); i++) {
+			Map<String, String> v = pages.get(i).getValues();
+			if( v != null ) {
+				t = t.withValues(extensions.get(i), v);
+			}
+		}
 		return editing != null && editing.getDescription() != null ? t.withDescription(editing.getDescription()) : t;
 	}
 
@@ -184,6 +203,11 @@ public class ThemeDesigner extends JDialog {
 		updating = true;
 		System.arraycopy(t.colors(), 0, colors, 0, colors.length);
 		dark.setSelected(t.isDark());
+		// the applications' settings come from the theme started from too
+		startExtras = t.getExtras();
+		for(int i = 0; i < pages.size(); i++) {
+			pages.get(i).setValues(t.values(extensions.get(i)), t);
+		}
 		if( editing == null ) {
 			selectInStartFrom(t);
 		}
@@ -307,7 +331,28 @@ public class ThemeDesigner extends JDialog {
 		left.add(dark);
 		left.add(Box.createVerticalStrut(8));
 		left.add(colorGrid());
-		content.add(left, BorderLayout.WEST);
+		if( extensions.isEmpty() ) {
+			content.add(left, BorderLayout.WEST);
+		} else {
+			// a tab for the look's colors, and one for each application's page; the gradient shows
+			// through the tabs' content, as through the rest of the dialog
+			Object contentOpaque = UIManager.get("TabbedPane.contentOpaque");
+			UIManager.put("TabbedPane.contentOpaque", Boolean.FALSE);
+			JTabbedPane tabs = new JTabbedPane();
+			UIManager.put("TabbedPane.contentOpaque", contentOpaque);
+			tabs.setOpaque(false);
+			left.setOpaque(false);
+			dark.setOpaque(false);
+			left.setBorder(new EmptyBorder(8, 8, 8, 8));
+			tabs.addTab("Colors", left);
+			for(ThemeExtension x : extensions) {
+				ThemeExtension.Page page = x.createPage();
+				page.setChangeListener(this::refresh);
+				pages.add(page);
+				tabs.addTab(x.getTitle(), page.getComponent());
+			}
+			content.add(tabs, BorderLayout.WEST);
+		}
 
 		JPanel right = new JPanel();
 		right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
@@ -409,8 +454,17 @@ public class ThemeDesigner extends JDialog {
 	}
 
 	private JComponent colorGrid() {
-		JPanel grid = new JPanel(new GridBagLayout());
+		JPanel grid = new JPanel(new GridBagLayout()) {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Dimension getMaximumSize() {
+				// on the left, at its own size, however wide the column is
+				return getPreferredSize();
+			}
+		};
 		grid.setAlignmentX(LEFT_ALIGNMENT);
+		grid.setOpaque(false);
 		for(int i = 0; i < colors.length; i++) {
 			final int role = i;
 			GridBagConstraints c = new GridBagConstraints();
@@ -489,6 +543,7 @@ public class ThemeDesigner extends JDialog {
 		p.add(l, BorderLayout.WEST);
 		p.add(c, BorderLayout.CENTER);
 		p.setAlignmentX(LEFT_ALIGNMENT);
+		p.setOpaque(false);
 		p.setMaximumSize(new Dimension(Integer.MAX_VALUE, p.getPreferredSize().height));
 		return p;
 	}
