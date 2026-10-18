@@ -320,6 +320,9 @@ public final class GradientLook {
 			} else if( c instanceof javax.swing.JSplitPane || c instanceof javax.swing.JToolBar ) {
 				((JComponent) c).setOpaque(false);
 				seeThroughPanels((Container) c);
+			} else if( c instanceof javax.swing.JTabbedPane ) {
+				// the tabs' panels: the tabbed pane itself keeps its look (its tabs are drawn on it)
+				seeThroughPanels((Container) c);
 			}
 		}
 	}

@@ -51,7 +51,9 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
+import javax.swing.UIManager;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
@@ -67,6 +69,9 @@ import us.bringardner.swing.gradient.Theme;
  * <p>
  * An application loads the saved settings at start-up with {@code GradientLook.install(prefs)}
  * and opens this dialog with {@link #showDialog(Window, Preferences)}.
+ * <p>
+ * An application can add its own tabs ({@link SettingsPages}): then the dialog is "Settings", with
+ * the appearance on the first tab, and OK keeps every tab's changes.
  */
 public class SettingsDialog extends JDialog {
 
@@ -88,6 +93,10 @@ public class SettingsDialog extends JDialog {
 	private final JButton editButton = new JButton("Edit theme...");
 	private final JButton deleteButton = new JButton("Delete theme");
 	private final ThemePreview preview = new ThemePreview();
+	/** The applications' own tabs (none: no tabs). */
+	private final List<SettingsPage> pages = SettingsPages.create();
+	private JTabbedPane tabs;
+	private JButton resetButton;
 
 	/** Opens the dialog, without saving the choice anywhere: OK only puts it into effect. */
 	public SettingsDialog() {
@@ -115,7 +124,8 @@ public class SettingsDialog extends JDialog {
 		build();
 		show(chosen);
 		pack();
-		setResizable(false);
+		// the applications' tabs may want more room (a list, say)
+		setResizable(!pages.isEmpty());
 		setLocationRelativeTo(owner);
 	}
 
@@ -168,8 +178,29 @@ public class SettingsDialog extends JDialog {
 		show(chosen);
 	}
 
-	/** OK: puts the choice into effect, saves it if there is a preferences node, and closes. */
+	/**
+	 * OK: keeps the applications' tabs' changes, puts the appearance into effect, saves it if there
+	 * is a preferences node, and closes. A tab that can't keep its changes is shown, with why, and
+	 * the dialog stays open.
+	 */
 	public void ok() {
+		for(SettingsPage p : pages) {
+			String problem = p.problem();
+			if( problem != null ) {
+				showPage(p);
+				tell(p.getTitle(), problem, JOptionPane.WARNING_MESSAGE);
+				return;
+			}
+		}
+		for(SettingsPage p : pages) {
+			try {
+				p.ok();
+			} catch (Exception e) {
+				showPage(p);
+				tell(p.getTitle(), "Can't keep the changes: " + e.getMessage(), JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+		}
 		accepted = true;
 		dispose();
 		if( !chosen.equals(original) ) {
@@ -182,6 +213,9 @@ public class SettingsDialog extends JDialog {
 
 	/** Cancel: closes without changing anything. */
 	public void cancel() {
+		for(SettingsPage p : pages) {
+			p.cancel();
+		}
 		accepted = false;
 		dispose();
 	}
@@ -244,6 +278,23 @@ public class SettingsDialog extends JDialog {
 		}
 	}
 
+	/** The applications' tabs in this dialog. */
+	public List<SettingsPage> getPages() {
+		return pages;
+	}
+
+	/** Shows a message (a JOptionPane message type); tests replace it, as there's no one to close it. */
+	protected void tell(String title, String message, int type) {
+		JOptionPane.showMessageDialog(this, message, title, type);
+	}
+
+	/** Shows a tab: one of {@link #getPages()}. */
+	public void showPage(SettingsPage p) {
+		if( tabs != null && pages.contains(p) ) {
+			tabs.setSelectedComponent(p.getComponent());
+		}
+	}
+
 	// ---------------------------------------------------------------- the dialog's parts
 
 	private void build() {
@@ -253,7 +304,24 @@ public class SettingsDialog extends JDialog {
 
 		JPanel sections = new JPanel();
 		sections.setLayout(new BoxLayout(sections, BoxLayout.Y_AXIS));
-		content.add(sections, BorderLayout.CENTER);
+		if( pages.isEmpty() ) {
+			content.add(sections, BorderLayout.CENTER);
+		} else {
+			// Appearance, then the applications' tabs; the gradient shows through, as in the designer
+			setTitle("Settings");
+			Object contentOpaque = UIManager.get("TabbedPane.contentOpaque");
+			UIManager.put("TabbedPane.contentOpaque", Boolean.FALSE);
+			tabs = new JTabbedPane();
+			UIManager.put("TabbedPane.contentOpaque", contentOpaque);
+			tabs.setOpaque(false);
+			sections.setOpaque(false);
+			sections.setBorder(new EmptyBorder(10, 10, 10, 10));
+			tabs.addTab("Appearance", sections);
+			for(SettingsPage p : pages) {
+				tabs.addTab(p.getTitle(), p.getComponent());
+			}
+			content.add(tabs, BorderLayout.CENTER);
+		}
 
 		sections.add(heading("Theme"));
 		sections.add(themeGrid());
@@ -346,8 +414,12 @@ public class SettingsDialog extends JDialog {
 
 	private JComponent buttons() {
 		JPanel p = new JPanel(new BorderLayout());
-		JButton resetButton = new JButton("Reset to defaults");
+		resetButton = new JButton("Reset to defaults");
 		resetButton.addActionListener(e->reset());
+		if( tabs != null ) {
+			// the appearance's defaults: shown with the Appearance tab only
+			tabs.addChangeListener(e->resetButton.setVisible(tabs.getSelectedIndex() == 0));
+		}
 		JPanel left = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		left.add(resetButton);
 		p.add(left, BorderLayout.WEST);

@@ -4,6 +4,12 @@
 
 ### Added
 
+- Applications' own tabs in Settings: register a `us.bringardner.swing.dialog.SettingsPage` with
+  `SettingsPages.register(id, factory)` and the Settings dialog has tabs, Appearance first, titled
+  "Settings". OK asks each page for a problem first (which keeps the dialog open, on that page) and
+  then keeps every page's changes; Cancel tells the pages. Reset to defaults shows with the
+  Appearance tab only. With no pages registered, the dialog is as it was.
+- `GradientLook.seeThroughPanels` clears the panels in a tabbed pane's tabs too.
 - Buttons in the theme: the gradient look (`GradientLook.install()`) draws every `JButton` with text in
   the theme's colors, as the JavaFX look does (`us.bringardner.swing.ui.GradientButtonUI`), with the
   default button bold. Before, they were the look and feel's own: on macOS, the default button (OK,
