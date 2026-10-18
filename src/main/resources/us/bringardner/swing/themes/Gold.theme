@@ -1,0 +1,19 @@
+# A theme for the gradient look (us.bringardner.swing.gradient.Theme). Colors are #RRGGBB.
+# start/end: the gradient, light to dark; text: text on the gradient; field/fieldText: text
+# fields, text areas and lists; selection/selectionText: selected rows and text;
+# header/headerText: table headers; accent: grid lines, outlines, scroll bars and the tree and
+# sort arrows; buttonText: the text on gradient buttons; dark: true for light text on dark.
+name=Gold
+description=The gold gradient the look has always had (the default)
+dark=false
+start=#F2CE71
+end=#967B28
+text=#000000
+field=#FFFFFF
+fieldText=#000000
+selection=#967B28
+selectionText=#FFFFFF
+header=#967B28
+headerText=#FFFFFF
+accent=#967B28
+buttonText=#FFFFFF

@@ -24,6 +24,21 @@
   already uses, so saved fonts carry over) and `apply()`, which updates the windows already open.
   `GradientLook.install(prefs)` installs the look with the saved choice.
 - `GradientPanel.getGradientStart()` / `getGradientEnd()`: the colors a panel paints with.
+- Themes are `.theme` files (properties: a name, a description, whether it is dark, and the eleven
+  colors as `#RRGGBB`). The built-in ones are in `us/bringardner/swing/themes`, in the order of
+  `themes.list`. `Theme.read` and `write` read and write one.
+- The user's own themes, in `~/.bringardner/themes` (or the folder the `bringardner.themes.dir`
+  system property names), shared by every application built on swing-widgets:
+  `Theme.userThemes()`, `saveUserTheme`, `deleteUserTheme`, `userThemesDir()`, and `Theme.all()`
+  (the built-in themes, then the user's). `Theme.named` finds the user's themes too, so a saved
+  `Appearance` can name one.
+- `ThemeDesigner`: designs a new theme starting from any theme (or a color), with every color
+  editable by a color chooser or as hex, a preview, and readability checks; saving always makes a
+  new theme. It also edits one of the user's own themes in place, including renaming it.
+  `Theme.contrast` is the WCAG contrast ratio it checks with.
+- `ThemePreview`: a small window's worth of any theme, used by the settings dialog and the designer.
+- `SettingsDialog`: Design a theme..., Edit theme... and Delete theme (the last two for the user's own
+  themes), and the user's themes among the cards.
 
 ### Changed
 

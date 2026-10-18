@@ -25,7 +25,6 @@ package us.bringardner.swing.dialog;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -47,30 +46,24 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JColorChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
 
 import us.bringardner.swing.gradient.Appearance;
-import us.bringardner.swing.gradient.GradientButton;
 import us.bringardner.swing.gradient.GradientLook;
-import us.bringardner.swing.gradient.GradientPanel;
 import us.bringardner.swing.gradient.Theme;
 
 /**
- * The appearance settings: the font, and a theme chosen from the built-in ones or made from any
- * one color. A preview shows the choice before it is used. OK puts it into effect in every open
- * window and, given a preferences node, saves it; Cancel changes nothing.
+ * The appearance settings: the font, and a theme chosen from the built-in ones and the user's own.
+ * "Design a theme..." makes a new theme from any of them ({@link ThemeDesigner}); the user's own
+ * themes can be deleted. A preview shows the choice before it is used. OK puts it into effect in
+ * every open window and, given a preferences node, saves it; Cancel changes nothing.
  * <p>
  * An application loads the saved settings at start-up with {@code GradientLook.install(prefs)}
  * and opens this dialog with {@link #showDialog(Window, Preferences)}.
@@ -84,31 +77,17 @@ public class SettingsDialog extends JDialog {
 	private final Preferences prefs;
 	private final Appearance original;
 	private Appearance chosen;
-	private Color customColor;
 	private boolean accepted;
 
 	private final JLabel fontSample = new JLabel("<html><div style='width:280px'>" + SAMPLE_TEXT + "</div></html>");
 	private final JLabel fontName = new JLabel();
 	private final JButton standardFontButton = new JButton("Use the standard font");
 	private final List<ThemeCard> cards = new ArrayList<>();
-	private ThemeCard customCard;
+	private final JPanel grid = new JPanel(new GridLayout(0, 5, 10, 10));
 	private final JLabel themeName = new JLabel();
-
-	private final GradientPanel preview = new GradientPanel(GradientPanel.DIAGONAL_RIGHT);
-	private final JLabel previewLabel = new JLabel("Folder:");
-	private final JTextField previewField = new JTextField("Documents/Reports", 16);
-	private final GradientButton previewButton = new GradientButton("Open");
-	private final JTable previewTable = new JTable(new DefaultTableModel(new Object[][] {
-		{"Reports", "Folder", ""}, {"budget.xlsx", "File", "48 KB"}, {"notes.txt", "File", "2 KB"}},
-			new Object[] {"Name", "Type", "Size"}) {
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public boolean isCellEditable(int row, int column) {
-			return false;
-		}
-	});
-	private JScrollPane previewScroll;
+	private final JButton editButton = new JButton("Edit theme...");
+	private final JButton deleteButton = new JButton("Delete theme");
+	private final ThemePreview preview = new ThemePreview();
 
 	/** Opens the dialog, without saving the choice anywhere: OK only puts it into effect. */
 	public SettingsDialog() {
@@ -132,9 +111,6 @@ public class SettingsDialog extends JDialog {
 		this.prefs = prefs;
 		this.original = Appearance.current();
 		this.chosen = original;
-		if( original.getTheme().isCustom() ) {
-			customColor = original.getTheme().getBaseColor();
-		}
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		build();
 		show(chosen);
@@ -172,13 +148,10 @@ public class SettingsDialog extends JDialog {
 	/** Chooses a theme. */
 	public void selectTheme(Theme theme) {
 		chosen = chosen.withTheme(theme);
-		if( theme.isCustom() ) {
-			customColor = theme.getBaseColor();
-		}
 		show(chosen);
 	}
 
-	/** Chooses a theme made from one color (what Custom... does once a color is picked). */
+	/** Chooses a theme made from one color (as the theme designer can start from). */
 	public void selectColor(Color color) {
 		selectTheme(Theme.fromColor(color));
 	}
@@ -192,7 +165,6 @@ public class SettingsDialog extends JDialog {
 	/** Back to the gold theme and the standard font (in effect only after OK). */
 	public void reset() {
 		chosen = Appearance.defaults();
-		customColor = null;
 		show(chosen);
 	}
 
@@ -223,11 +195,52 @@ public class SettingsDialog extends JDialog {
 		}
 	}
 
-	protected void actionCustomColor() {
-		Color start = customColor != null ? customColor : chosen.getEnd();
-		Color c = JColorChooser.showDialog(this, "Choose a color for your theme", start);
-		if( c != null ) {
-			selectColor(c);
+	/** Design a theme...: the designer, starting from the theme chosen here; a saved one is chosen. */
+	protected void actionDesign() {
+		Theme t = ThemeDesigner.design(this, chosen.getTheme());
+		if( t != null ) {
+			designed(t);
+		}
+	}
+
+	/** Edit theme...: the designer, changing the chosen theme (one of the user's own) in place. */
+	protected void actionEdit() {
+		Theme t = chosen.getTheme();
+		if( !t.isUserTheme() ) {
+			return;
+		}
+		Theme changed = ThemeDesigner.edit(this, t);
+		if( changed != null ) {
+			designed(changed);
+		}
+	}
+
+	/** A theme the designer saved: it gets a card and is chosen. */
+	public void designed(Theme t) {
+		fillGrid();
+		selectTheme(t);
+		pack();
+	}
+
+	/** Delete theme: deletes the chosen theme, one of the user's own, once they say so. */
+	protected void actionDelete() {
+		Theme t = chosen.getTheme();
+		if( !t.isUserTheme() ) {
+			return;
+		}
+		int answer = JOptionPane.showConfirmDialog(this, "Delete your theme \"" + t.getName() + "\"?",
+				"Delete Theme", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if( answer == JOptionPane.OK_OPTION ) {
+			deleteTheme(t);
+		}
+	}
+
+	/** Deletes one of the user's themes; the gold theme is chosen in its place. */
+	public void deleteTheme(Theme t) {
+		if( t.isUserTheme() && Theme.deleteUserTheme(t.getName()) ) {
+			fillGrid();
+			selectTheme(Theme.GOLD);
+			pack();
 		}
 	}
 
@@ -244,6 +257,22 @@ public class SettingsDialog extends JDialog {
 
 		sections.add(heading("Theme"));
 		sections.add(themeGrid());
+		JPanel themeButtons = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		themeButtons.setAlignmentX(LEFT_ALIGNMENT);
+		themeButtons.setBorder(new EmptyBorder(8, 0, 0, 0));
+		JButton designButton = new JButton("Design a theme...");
+		designButton.setToolTipText("Make a new theme, starting from the one chosen here");
+		designButton.addActionListener(e->actionDesign());
+		deleteButton.setToolTipText("Delete the chosen theme (only your own themes can be deleted)");
+		deleteButton.addActionListener(e->actionDelete());
+		editButton.setToolTipText("Change the chosen theme (only your own themes can be changed)");
+		editButton.addActionListener(e->actionEdit());
+		themeButtons.add(designButton);
+		themeButtons.add(Box.createHorizontalStrut(8));
+		themeButtons.add(editButton);
+		themeButtons.add(Box.createHorizontalStrut(8));
+		themeButtons.add(deleteButton);
+		sections.add(themeButtons);
 		themeName.setAlignmentX(LEFT_ALIGNMENT);
 		themeName.setBorder(new EmptyBorder(4, 0, 0, 0));
 		sections.add(themeName);
@@ -262,20 +291,28 @@ public class SettingsDialog extends JDialog {
 	}
 
 	private JComponent themeGrid() {
-		JPanel grid = new JPanel(new GridLayout(0, 5, 10, 10));
-		grid.setAlignmentX(LEFT_ALIGNMENT);
-		for(Theme t : Theme.THEMES) {
-			ThemeCard card = new ThemeCard(t.getName(), t, ()->selectTheme(t));
-			cards.add(card);
-			grid.add(card);
-		}
-		customCard = new ThemeCard("Custom...", null, this::actionCustomColor);
-		customCard.setToolTipText("Pick any color: the theme is made from light and dark shades of it");
-		grid.add(customCard);
+		fillGrid();
 		JPanel wrap = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		wrap.setAlignmentX(LEFT_ALIGNMENT);
 		wrap.add(grid);
 		return wrap;
+	}
+
+	/** A card for each theme: the built-in ones, the user's, and a custom one if it is in effect. */
+	private void fillGrid() {
+		grid.removeAll();
+		cards.clear();
+		List<Theme> themes = Theme.all();
+		if( chosen.getTheme().isCustom() || original.getTheme().isCustom() ) {
+			themes.add(chosen.getTheme().isCustom() ? chosen.getTheme() : original.getTheme());
+		}
+		for(Theme t : themes) {
+			ThemeCard card = new ThemeCard(t.getName(), t, ()->selectTheme(t));
+			cards.add(card);
+			grid.add(card);
+		}
+		grid.revalidate();
+		grid.repaint();
 	}
 
 	private JComponent fontSection() {
@@ -303,36 +340,7 @@ public class SettingsDialog extends JDialog {
 	}
 
 	private JComponent previewSection() {
-		preview.setLayout(new BorderLayout(0, 8));
-		preview.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createLineBorder(new Color(0, 0, 0, 60)), new EmptyBorder(10, 10, 10, 10)));
 		preview.setAlignmentX(LEFT_ALIGNMENT);
-
-		JPanel north = new JPanel(new BorderLayout(8, 0));
-		north.setOpaque(false);
-		north.add(previewLabel, BorderLayout.WEST);
-		previewField.setEditable(false);
-		previewField.setFocusable(false);
-		north.add(previewField, BorderLayout.CENTER);
-		preview.add(north, BorderLayout.NORTH);
-
-		previewTable.setFocusable(false);
-		previewTable.setRowSelectionAllowed(true);
-		previewTable.setShowGrid(true);
-		previewTable.setRowSelectionInterval(1, 1);
-		JScrollPane sp = new JScrollPane(previewTable, JScrollPane.VERTICAL_SCROLLBAR_NEVER,
-				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		previewScroll = sp;
-		GradientLook.seeThrough(sp);
-		sp.setColumnHeaderView(previewTable.getTableHeader());
-		sp.getColumnHeader().setOpaque(false);
-		preview.add(sp, BorderLayout.CENTER);
-
-		JPanel south = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
-		south.setOpaque(false);
-		previewButton.setPreferredSize(new Dimension(90, 30));
-		south.add(previewButton);
-		preview.add(south, BorderLayout.SOUTH);
 		return preview;
 	}
 
@@ -377,52 +385,17 @@ public class SettingsDialog extends JDialog {
 		standardFontButton.setEnabled(a.getFont() != null);
 
 		for(ThemeCard c : cards) {
-			c.setSelected(!t.isCustom() && c.theme.equals(t));
+			c.setSelected(c.theme.equals(t));
 		}
-		customCard.theme = t.isCustom() ? t : null;
-		customCard.setSelected(t.isCustom());
-		customCard.repaint();
-		themeName.setText(t.isCustom() ? "Your own theme, made from the color you picked"
-				: t.getName() + (t == Theme.GOLD ? " (the default)" : "") + (t.isDark() ? ": light text on dark backgrounds" : ""));
+		String about = t.getDescription() != null ? t.getDescription()
+				: t.isCustom() ? "Made from one color"
+				: t.isUserTheme() ? "One of your themes" : null;
+		themeName.setText(t.getName() + (about == null ? "" : ": " + about));
+		editButton.setEnabled(t.isUserTheme());
+		deleteButton.setEnabled(t.isUserTheme());
 
 		// the preview, painted in the chosen theme (not the one in effect)
-		preview.setBackground(t.getStart());
-		preview.setForeground(t.getEnd());
-		previewLabel.setForeground(t.getText());
-		previewLabel.setFont(f);
-		previewField.setBackground(t.getField());
-		previewField.setForeground(t.getFieldText());
-		previewField.setFont(f);
-		previewButton.setBackground(t.getStart());
-		previewButton.setForeground(t.getEnd());
-		previewButton.setTextColor(t.getButtonText());
-		previewTable.setForeground(t.getText());
-		previewTable.setGridColor(t.getAccent());
-		previewTable.setSelectionBackground(t.getSelection());
-		previewTable.setSelectionForeground(t.getSelectionText());
-		previewTable.setFont(f);
-		previewTable.setRowHeight(previewTable.getFontMetrics(f).getHeight() + 4);
-		DefaultTableCellRenderer header = new DefaultTableCellRenderer();
-		header.setOpaque(true);
-		header.setBackground(t.getHeader());
-		header.setForeground(t.getHeaderText());
-		header.setFont(f.deriveFont(Font.BOLD));
-		header.setHorizontalAlignment(SwingConstants.CENTER);
-		header.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, t.getAccent()));
-		previewTable.getTableHeader().setDefaultRenderer(new DefaultTableCellRenderer() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-					boolean hasFocus, int row, int column) {
-				header.setText(value == null ? "" : value.toString());
-				return header;
-			}
-		});
-		// the table shows all its rows at any font size
-		int headerHeight = previewTable.getFontMetrics(f.deriveFont(Font.BOLD)).getHeight() + 8;
-		previewScroll.setPreferredSize(new Dimension(440,
-				headerHeight + previewTable.getRowHeight() * previewTable.getRowCount() + 4));
+		preview.show(t, a.getFont());
 		if( isDisplayable() ) {
 			pack();
 		}

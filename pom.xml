@@ -167,6 +167,12 @@
 					<version>3.5.2</version>
 					<!-- If an argLine is ever added here, write it as <argLine>@{argLine} ...</argLine>
 					     so it does not replace the JaCoCo agent set by prepare-agent. -->
+					<configuration>
+						<systemPropertyVariables>
+							<!-- tests save themes here, not in the real ~/.bringardner/themes -->
+							<bringardner.themes.dir>${project.build.directory}/test-themes</bringardner.themes.dir>
+						</systemPropertyVariables>
+					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.jacoco</groupId>

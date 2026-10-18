@@ -1,0 +1,19 @@
+# A theme for the gradient look (us.bringardner.swing.gradient.Theme). Colors are #RRGGBB.
+# start/end: the gradient, light to dark; text: text on the gradient; field/fieldText: text
+# fields, text areas and lists; selection/selectionText: selected rows and text;
+# header/headerText: table headers; accent: grid lines, outlines, scroll bars and the tree and
+# sort arrows; buttonText: the text on gradient buttons; dark: true for light text on dark.
+name=Light
+description=Nearly flat and pale, with dark text
+dark=false
+start=#FFFFFF
+end=#DAD7CE
+text=#1E1E1E
+field=#FFFFFF
+fieldText=#1E1E1E
+selection=#D8CBA6
+selectionText=#1E1E1E
+header=#CFCABD
+headerText=#1E1E1E
+accent=#8A7B57
+buttonText=#1E1E1E

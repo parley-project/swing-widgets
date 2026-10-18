@@ -61,6 +61,7 @@ library because it has no UI and no dependencies, so both toolkits can reach it.
 | | `GradientLook` | The whole gradient look in one call, as parley-files-viewer has it: gradient panels and scroll bars, see-through trees and tables, gold tree and sort arrows. |
 | `us.bringardner.swing.dialog` | `MessageDialog` | Gradient-styled message, warning, error and input dialogs (`showMessageDialog`, `showErrorDialog`, ...). |
 | | `FontDialog`, `SettingsDialog` | Choose a font; the appearance settings (theme and font, with a preview), saved in preferences. |
+| | `ThemeDesigner`, `ThemePreview` | Design a new theme from an existing one, or edit one of your own; a small window's worth of a theme. |
 | `us.bringardner.swing.field` | `TextFieldPanel`, `PasswordPanel` | A text field with a prompt shown while it's empty; a password field with a show/hide eye. |
 | `us.bringardner.swing.ui` | `ScrollBarUI`, `TableHeaderUI` | Gradient look for scroll bars and table headers. |
 | | `GlassPane` | A glass pane that blocks input and shows a spinning globe while the application is busy. |
@@ -177,6 +178,42 @@ SettingsDialog.showDialog(frame, prefs);           // from a Preferences menu it
 `Appearance` is the choice itself, to load, save or apply without the dialog; `Theme` has each
 theme's colors (text, fields, selections, headers and so on) for code that draws its own parts.
 Gradient panels and buttons follow the current theme unless colors are set on them.
+
+### Designing themes
+
+In the appearance settings, **Design a theme...** opens `ThemeDesigner`: choose a theme to start
+from (or a color), change any of its eleven colors, watch the preview and the readability checks
+(the contrast of each kind of text against what is behind it), and save it under a new name. The
+theme started from is never changed. **Edit theme...** changes one of your own themes in place
+(its colors, and its name if you like), and **Delete theme** deletes one. The built-in themes can't
+be edited or deleted.
+
+Your themes are `.theme` files in `~/.bringardner/themes`, shared by every application built on
+swing-widgets: a theme designed in one is offered in all of them. The system property
+`bringardner.themes.dir` names another folder (the tests use one under `target`). The built-in
+themes are the same kind of file, in `us/bringardner/swing/themes`, offered in the order of
+`themes.list` there; the first is the default. A theme file is a properties file:
+
+```properties
+name=Dark
+description=The Parley palette: ink backgrounds, warm off-white text, gold accents
+dark=true
+start=#3A3428
+end=#0E0D0B
+text=#E8E2D0
+field=#17150F
+fieldText=#E8E2D0
+selection=#6B5620
+selectionText=#F5EFDD
+header=#372C0F
+headerText=#D0AA42
+accent=#D0AA42
+buttonText=#F5EFDD
+```
+
+`Theme.read`/`write` read and write one, `Theme.userThemes()`, `saveUserTheme` and
+`deleteUserTheme` manage your folder, `Theme.all()` is the built-in themes and then yours, and
+`Theme.contrast` is the WCAG contrast ratio the designer checks with.
 
 ## Building and testing
 
