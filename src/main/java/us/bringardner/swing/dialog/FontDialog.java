@@ -98,6 +98,8 @@ public class FontDialog extends JDialog {
 	private JList<Integer> sizeList;
 	private static String [] styles = {"Plain","Bold","Italic","Bold Italic"};
 	private String names [] ;
+	/** The font the dialog opened with: its family stands in when it isn't in the list. */
+	private Font start;
 	private JScrollPane scrollPane_3;
 
 	/**
@@ -313,6 +315,10 @@ public class FontDialog extends JDialog {
 
 	protected void updatePreview() {
 		String fString = fontList.getSelectedValue();
+		if( fString == null ) {
+			// a font not in the list, such as macOS's hidden system font: keep its family
+			fString = start != null ? start.getFamily() : Font.DIALOG;
+		}
 		int style  = styleList.getSelectedIndex();
 		int sz = sizeList.getSelectedIndex()+5;
 
@@ -331,9 +337,12 @@ public class FontDialog extends JDialog {
 		setModal(true);
 		Font ret = null;
 		if( current != null ) {
-			fontList.setSelectedValue(current.getName(), true);
+			start = current;
+			// the list has families (a font's name can be a face, such as "Helvetica-Bold")
+			fontList.setSelectedValue(current.getFamily(), true);
 			styleList.setSelectedValue(styles[current.getStyle()], true);
 			sizeList.setSelectedValue(current.getSize(), true);
+			updatePreview();
 		}
 
 		setLocationRelativeTo(null);

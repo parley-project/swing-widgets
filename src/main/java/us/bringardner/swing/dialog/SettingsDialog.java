@@ -376,7 +376,8 @@ public class SettingsDialog extends JDialog {
 		Theme t = a.getTheme();
 		Font f = a.getFont() != null ? a.getFont() : new JLabel().getFont();
 
-		fontSample.setFont(f.deriveFont(Math.max(f.getSize2D(), 13f)));
+		// the sample is in the size chosen, small or large, so a change of size shows
+		fontSample.setFont(f);
 		fontSample.setBackground(t.getField());
 		fontSample.setForeground(t.getFieldText());
 		fontName.setText(a.getFont() == null
