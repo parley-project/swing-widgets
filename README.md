@@ -54,6 +54,7 @@ library because it has no UI and no dependencies, so both toolkits can reach it.
 | | `DateTimeCombo` | A date/time spinner with a button that opens `DateAndTimeDialog`. |
 | `us.bringardner.swing.menu` | `RecentItemsMenu` | A "Recent ..." menu of any kind of item, saved with `java.util.prefs.Preferences`. |
 | | `RecentItems` | The list behind that menu, without any UI: newest first, a maximum, saved with `Preferences`. fx-widgets' JavaFX menu uses it too, so the two share a list. |
+| | `StandardMenus` | The menu bar every Parley application uses: File, Edit, View, the application's menus, Window and Help, with About, Settings… and Quit where each platform expects them. |
 | `us.bringardner.swing.progress` | `ProgressMonitorUpdater` | Lets any thread update a Swing `ProgressMonitor`; the changes are made on the event dispatch thread. |
 | `us.bringardner.swing.gradient` | `GradientPanel`, `GradientButton` | A panel painted with a two-color gradient, and a rounded gradient button. |
 | | `GradientColors` | The colors the gradient widgets use (a gold gradient by default); set them before creating widgets. |
@@ -79,6 +80,7 @@ available.
 | `DateAndTimeDialog`, `DateTimeCombo` | None yet; `DatePicker` covers only the date |
 | `RecentItemsMenu` | fx-widgets' `RecentItemsMenu`, which shares its list with this one |
 | `RecentItems` | The same class: both menus use it |
+| `StandardMenus` | fx-widgets' `StandardMenus`: the same layout for a JavaFX `MenuBar` |
 | `ProgressMonitorUpdater` | A `Task`: call `updateProgress` and `updateMessage` from any thread, and bind a `ProgressBar` to its `progressProperty()` |
 | `GradientLook` | fx-widgets' `GradientLook`: a stylesheet with the same look |
 | `GradientPanel`, `GradientButton`, `GradientColors` | CSS: `-fx-background-color: linear-gradient(...)` and `-fx-background-radius` |
@@ -111,6 +113,29 @@ analog `Clock`, and can show seconds and milliseconds. The clock's hands can be 
 The parts of `TimePanel`, `DatePanel`, `DayPanel` and `DateTimeCombo` have names
 (`Component.getName()`), such as `hourSpinner`, `todayButton`, `btnBrowse` and `day1` to `day31`,
 so tests and GUI testing tools can find them.
+
+## Standard menus
+
+`StandardMenus` gives every Parley application the same menu bar. The application fills the File,
+Edit and View menus, adds its own menus, and says what About, Settings and Quit do:
+
+```java
+StandardMenus.useScreenMenuBar("My App");   // first thing in main(), before any Swing class loads
+
+StandardMenus menus = new StandardMenus("My App")
+        .about(() -> showAbout())
+        .settings(() -> SettingsDialog.showDialog(frame, prefs))
+        .quit(() -> okToQuit());
+menus.file.add(StandardMenus.item("Open...", KeyEvent.VK_O, () -> open()));
+menus.install(frame, runMenu);
+```
+
+The bar is File, Edit, View, the application's menus, Window and Help; an empty File, Edit, View
+or Help menu is left out. On macOS, About, Settings… (⌘,) and Quit (⌘Q) are in the application
+menu and each window's menu bar is shown at the top of the screen, so the shortcuts go to the
+focused window. Elsewhere Settings… (Ctrl+,) and Exit end the File menu and About is in Help.
+The Window menu has Minimize and lists the open windows. `item(...)` makes a menu item with the
+platform's shortcut key (⌘ on macOS, Ctrl elsewhere).
 
 ## Recent items menu
 

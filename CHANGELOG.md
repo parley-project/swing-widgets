@@ -4,6 +4,11 @@
 
 ### Added
 
+- `us.bringardner.swing.menu.StandardMenus`: one menu layout for every Parley application. File,
+  Edit, View, the application's own menus, Window and Help, in that order. On macOS, About,
+  Settings… (⌘,) and Quit (⌘Q) go in the application menu and the menu bar is at the top of the
+  screen (`useScreenMenuBar`); elsewhere Settings… and Exit end the File menu and About is in Help.
+  The Window menu lists the open windows and has Minimize (⌘M).
 - `us.bringardner.swing.gradient.GradientLook`: parley-files-viewer's look in one call, so every
   Parley application can have it. `install()` sets the UIManager defaults (gradient panels and
   scroll bars, see-through trees and tables, the dark color for grid lines, the table header and
