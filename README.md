@@ -181,7 +181,7 @@ Gradient panels and buttons follow the current theme unless colors are set on th
 
 ### Designing themes
 
-In the appearance settings, **Design a theme...** opens `ThemeDesigner`: choose a theme to start
+In the appearance settings, **New theme...** opens `ThemeDesigner`: choose a theme to start
 from (or a color), change any of its eleven colors, watch the preview and the readability checks
 (the contrast of each kind of text against what is behind it), and save it under a new name. The
 theme started from is never changed. **Edit theme...** changes one of your own themes in place

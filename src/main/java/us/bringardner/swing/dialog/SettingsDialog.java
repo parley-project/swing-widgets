@@ -61,7 +61,7 @@ import us.bringardner.swing.gradient.Theme;
 
 /**
  * The appearance settings: the font, and a theme chosen from the built-in ones and the user's own.
- * "Design a theme..." makes a new theme from any of them ({@link ThemeDesigner}); the user's own
+ * "New theme..." makes a new theme from any of them ({@link ThemeDesigner}); the user's own
  * themes can be deleted. A preview shows the choice before it is used. OK puts it into effect in
  * every open window and, given a preferences node, saves it; Cancel changes nothing.
  * <p>
@@ -195,7 +195,7 @@ public class SettingsDialog extends JDialog {
 		}
 	}
 
-	/** Design a theme...: the designer, starting from the theme chosen here; a saved one is chosen. */
+	/** New theme...: the designer, starting from the theme chosen here; a saved one is chosen. */
 	protected void actionDesign() {
 		Theme t = ThemeDesigner.design(this, chosen.getTheme());
 		if( t != null ) {
@@ -260,7 +260,7 @@ public class SettingsDialog extends JDialog {
 		JPanel themeButtons = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		themeButtons.setAlignmentX(LEFT_ALIGNMENT);
 		themeButtons.setBorder(new EmptyBorder(8, 0, 0, 0));
-		JButton designButton = new JButton("Design a theme...");
+		JButton designButton = new JButton("New theme...");
 		designButton.setToolTipText("Make a new theme, starting from the one chosen here");
 		designButton.addActionListener(e->actionDesign());
 		deleteButton.setToolTipText("Delete the chosen theme (only your own themes can be deleted)");

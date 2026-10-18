@@ -37,7 +37,7 @@
   new theme. It also edits one of the user's own themes in place, including renaming it.
   `Theme.contrast` is the WCAG contrast ratio it checks with.
 - `ThemePreview`: a small window's worth of any theme, used by the settings dialog and the designer.
-- `SettingsDialog`: Design a theme..., Edit theme... and Delete theme (the last two for the user's own
+- `SettingsDialog`: New theme..., Edit theme... and Delete theme (the last two for the user's own
   themes), and the user's themes among the cards.
 
 ### Changed

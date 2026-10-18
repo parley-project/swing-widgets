@@ -118,7 +118,7 @@ public class ThemeDesigner extends JDialog {
 	 * @param edit true to change the theme itself, which must be one of the user's own
 	 */
 	public ThemeDesigner(Window owner, Theme theme, boolean edit) {
-		super(owner, edit ? "Edit Theme" : "Design a Theme", ModalityType.APPLICATION_MODAL);
+		super(owner, edit ? "Edit Theme" : "New Theme", ModalityType.APPLICATION_MODAL);
 		if( edit && !theme.isUserTheme() ) {
 			throw new IllegalArgumentException("\"" + theme.getName() + "\" isn't one of your themes");
 		}
