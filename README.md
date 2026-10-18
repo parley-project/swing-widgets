@@ -57,9 +57,10 @@ library because it has no UI and no dependencies, so both toolkits can reach it.
 | `us.bringardner.swing.progress` | `ProgressMonitorUpdater` | Lets any thread update a Swing `ProgressMonitor`; the changes are made on the event dispatch thread. |
 | `us.bringardner.swing.gradient` | `GradientPanel`, `GradientButton` | A panel painted with a two-color gradient, and a rounded gradient button. |
 | | `GradientColors` | The colors the gradient widgets use (a gold gradient by default); set them before creating widgets. |
+| | `Theme`, `Appearance` | The themes (Gold, Dark, Light, Copper, Sage, Ocean, Slate, Plum, or one made from any color); the theme and font a user chose. |
 | | `GradientLook` | The whole gradient look in one call, as parley-files-viewer has it: gradient panels and scroll bars, see-through trees and tables, gold tree and sort arrows. |
 | `us.bringardner.swing.dialog` | `MessageDialog` | Gradient-styled message, warning, error and input dialogs (`showMessageDialog`, `showErrorDialog`, ...). |
-| | `FontDialog`, `SettingsDialog` | Choose a font; the appearance settings (font and color scheme, with a preview), saved in preferences. |
+| | `FontDialog`, `SettingsDialog` | Choose a font; the appearance settings (theme and font, with a preview), saved in preferences. |
 | `us.bringardner.swing.field` | `TextFieldPanel`, `PasswordPanel` | A text field with a prompt shown while it's empty; a password field with a show/hide eye. |
 | `us.bringardner.swing.ui` | `ScrollBarUI`, `TableHeaderUI` | Gradient look for scroll bars and table headers. |
 | | `GlassPane` | A glass pane that blocks input and shows a spinning globe while the application is busy. |
@@ -161,10 +162,10 @@ fx-widgets' `GradientLook`, which has the same colors.
 
 ### Letting users choose the font and colors
 
-`SettingsDialog` is the appearance settings: the font, and a color scheme chosen from named ones
-(Gold, Copper, Sage, Ocean, Slate, Plum) or made from any one color, with a preview. OK puts the
-choice into effect in every open window and saves it; Cancel changes nothing. Install the look with
-the saved choice at start-up:
+`SettingsDialog` is the appearance settings: a theme chosen from the built-in ones (Gold, Dark,
+Light, Copper, Sage, Ocean, Slate, Plum) or made from any one color, and the font, with a preview.
+OK puts the choice into effect in every open window and saves it; Cancel changes nothing. Install
+the look with the saved choice at start-up:
 
 ```java
 Preferences prefs = Preferences.userNodeForPackage(MyApp.class);
@@ -173,7 +174,9 @@ GradientLook.install(prefs);                       // instead of install()
 SettingsDialog.showDialog(frame, prefs);           // from a Preferences menu item
 ```
 
-`Appearance` is the choice itself, to load, save or apply without the dialog.
+`Appearance` is the choice itself, to load, save or apply without the dialog; `Theme` has each
+theme's colors (text, fields, selections, headers and so on) for code that draws its own parts.
+Gradient panels and buttons follow the current theme unless colors are set on them.
 
 ## Building and testing
 

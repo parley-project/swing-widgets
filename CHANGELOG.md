@@ -14,20 +14,32 @@
   library's own windows.
 - The tree and sort arrow icons, and the tree node icon, from parley-files-viewer, in
   `us/bringardner/swing/icons`.
-- `us.bringardner.swing.gradient.Appearance`: the font and color scheme a user chooses, with
-  named schemes (`SCHEMES`: Gold, Copper, Sage, Ocean, Slate, Plum), `Scheme.fromColor` to make a
-  scheme from any one color, `load`/`save` in `java.util.prefs.Preferences` (the font keys are the
-  ones parley-files-viewer already uses, so saved fonts carry over), and `apply()`, which updates the
-  windows already open. `GradientLook.install(prefs)` installs the look with the saved choice.
+- `us.bringardner.swing.gradient.Theme`: a named set of colors for each part of the look: the
+  gradient's two ends, text on the gradient, fields, selections, table headers, outlines and
+  gradient-button text, and whether it is dark. Built in (`THEMES`): Gold (the default), Dark (the
+  Parley ink and gold), Light, Copper, Sage, Ocean, Slate and Plum; `fromColor` makes one from any
+  one color. `GradientColors` now reads and sets the current theme's gradient.
+- `us.bringardner.swing.gradient.Appearance`: the theme and font a user chooses, with
+  `load`/`save` in `java.util.prefs.Preferences` (the font keys are the ones parley-files-viewer
+  already uses, so saved fonts carry over) and `apply()`, which updates the windows already open.
+  `GradientLook.install(prefs)` installs the look with the saved choice.
+- `GradientPanel.getGradientStart()` / `getGradientEnd()`: the colors a panel paints with.
 
 ### Changed
 
 - `SettingsDialog` works now: it was a sketch whose OK did nothing, whose colors were never kept and
-  whose font change took effect even on Cancel. It shows the font with Change... and Use the
-  standard font, the color schemes as swatches with a Custom... that makes one from a single color
-  (instead of "Color 1" and "Color 2"), a preview, and Reset to defaults. OK applies and, given a
-  preferences node, saves; Cancel changes nothing. New: `SettingsDialog(Preferences)`,
-  `SettingsDialog(Window, Preferences)` and `showDialog(Window, Preferences)`.
+  whose font change took effect even on Cancel. It shows the themes as cards (each a small picture of
+  the theme) with a Custom... that makes one from a single color (instead of "Color 1" and
+  "Color 2"), the font with Change... and Use the standard font, a preview, and Reset to defaults.
+  OK applies and, given a preferences node, saves; Cancel changes nothing. New:
+  `SettingsDialog(Preferences)`, `SettingsDialog(Window, Preferences)` and
+  `showDialog(Window, Preferences)`.
+- `GradientPanel` and `GradientButton` paint with the current theme unless colors are set on them,
+  so they follow a theme change; they no longer copy the colors when they are created.
+  `GradientButton`'s text is the theme's button text color unless `setTextColor` is used.
+  `FontDialog` and `MessageDialog` follow the theme too.
+- In the gold theme, selected rows and table headers have white text: light gold on dark gold was
+  hard to read.
 
 ## swing-widgets 1.0.0 (2026-10-16)
 

@@ -61,14 +61,17 @@ public class TestWidgets {
 			GradientColors.setStart(Color.BLUE);
 			GradientColors.setEnd(Color.BLACK);
 			GradientButton button = new GradientButton("OK");
-			assertEquals(Color.BLUE, button.getBackground());
-			assertEquals(Color.BLACK, button.getForeground());
+			assertEquals(Color.BLUE, button.getGradientStart());
+			assertEquals(Color.BLACK, button.getGradientEnd());
+			// colors set on the button win over the theme's
+			button.setBackground(Color.red);
+			assertEquals(Color.red, button.getGradientStart());
 			assertThrows(NullPointerException.class, () -> GradientColors.setStart(null));
 		} finally {
 			GradientColors.setStart(GradientColors.DEFAULT_START);
 			GradientColors.setEnd(GradientColors.DEFAULT_END);
 		}
-		assertSame(GradientColors.DEFAULT_START, new GradientButton("OK").getBackground());
+		assertEquals(GradientColors.DEFAULT_START, new GradientButton("OK").getGradientStart());
 	}
 
 	@Test

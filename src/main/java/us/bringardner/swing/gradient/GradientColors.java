@@ -26,9 +26,10 @@ import java.awt.Color;
 import java.util.Objects;
 
 /**
- * The colors the gradient widgets (GradientButton, the dialogs, the scroll bar) are drawn with.
- * The defaults are a gold gradient. An application can set its own before it creates any
- * widgets; widgets read the colors when they are created.
+ * The two colors of the gradient: those of the current {@link Theme}. Kept for the code that used
+ * them before there were themes; a theme has more colors (text, fields, selections and so on), so
+ * new code uses {@link Theme#current()}. Setting a color here makes a custom theme from the current
+ * one with that gradient.
  */
 public final class GradientColors {
 
@@ -36,27 +37,32 @@ public final class GradientColors {
 	public static final Color DEFAULT_END   = new Color(150, 123, 40);
 	public static final Color TRANSPARENT   = new Color(255, 255, 255, 0);
 
-	private static volatile Color start = DEFAULT_START;
-	private static volatile Color end = DEFAULT_END;
-
 	private GradientColors() {
 	}
 
 	/** @return the light color a gradient starts with */
 	public static Color getStart() {
-		return start;
+		return Theme.current().getStart();
 	}
 
 	public static void setStart(Color color) {
-		start = Objects.requireNonNull(color, "color");
+		Objects.requireNonNull(color, "color");
+		Theme t = Theme.current();
+		if( !color.equals(t.getStart()) ) {
+			Theme.setCurrent(t.withGradient(color, t.getEnd()));
+		}
 	}
 
 	/** @return the dark color a gradient ends with */
 	public static Color getEnd() {
-		return end;
+		return Theme.current().getEnd();
 	}
 
 	public static void setEnd(Color color) {
-		end = Objects.requireNonNull(color, "color");
+		Objects.requireNonNull(color, "color");
+		Theme t = Theme.current();
+		if( !color.equals(t.getEnd()) ) {
+			Theme.setCurrent(t.withGradient(t.getStart(), color));
+		}
 	}
 }

@@ -50,7 +50,8 @@ public class GradientButton extends GradientPanel  {
 	private static final long serialVersionUID = 1L;
 	private List<ActionListener> actionListeners = new ArrayList<>();
 	private String text="Text";
-	private Color textColor=Color.white;
+	/** null: the theme's button text color */
+	private Color textColor;
 	private int borderSize = 2;
 	private boolean pressed = false;
 	
@@ -73,10 +74,8 @@ public class GradientButton extends GradientPanel  {
 	public GradientButton() {
 		super(GradientPanel.DIAGONAL_LEFT);
 		setPreferredSize(new Dimension(122, 29));
-		setBackground(GradientColors.getStart());
-		setForeground(GradientColors.getEnd());
-
-		setBorder(new LineBorder(getForeground(),borderSize,true));
+		// the colors are the current theme's unless set: see GradientPanel.gradientStart
+		setBorder(new ThemeBorder());
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -102,20 +101,24 @@ public class GradientButton extends GradientPanel  {
 		setText(string);
 	}
 
-	@Override
-	public void setBackground(Color bg) {
-		super.setBackground(bg);
-		setBorder(new LineBorder(bg, borderSize,true));		
+	/** The rounded outline, in the button's dark color as it is when painted. */
+	private class ThemeBorder extends javax.swing.border.AbstractBorder {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void paintBorder(java.awt.Component c, Graphics g, int x, int y, int w, int h) {
+			new LineBorder(GradientPanel.gradientEnd(c), borderSize, true).paintBorder(c, g, x, y, w, h);
+		}
+
+		@Override
+		public java.awt.Insets getBorderInsets(java.awt.Component c) {
+			return new java.awt.Insets(borderSize, borderSize, borderSize, borderSize);
+		}
 	}
 
-	@Override
-	public void setForeground(Color fg) {
-		super.setForeground(fg);
-		setBorder(new LineBorder(fg, borderSize,true));
-	}
-
+	/** @return the text color: the one set, or the current theme's button text color */
 	public Color getTextColor() {
-		return textColor;
+		return textColor != null ? textColor : Theme.current().getButtonText();
 	}
 
 	public void setTextColor(Color textColor) {
@@ -164,15 +167,15 @@ public class GradientButton extends GradientPanel  {
 			Rectangle2D b = fm.getStringBounds(text, g2);
 			float x = (float) ((getWidth()/2)-((b.getWidth()/2)));
 			float y = (float) ((getHeight()/2)+((b.getHeight()/2)))-2;
-			g2.setColor(textColor);
+			g2.setColor(getTextColor());
 			g2.drawString(text, x, y);
 			g2.setColor(c);
 		}
 		g2.setClip(null);
 		if( !pressed ) {
-			g2.setColor(getForeground());
+			g2.setColor(GradientPanel.gradientEnd(this));
 		} else {
-			g2.setColor(getBackground());
+			g2.setColor(GradientPanel.gradientStart(this));
 		}
 		g2.setStroke(new BasicStroke(getBorderSize()));
 		g2.draw(r);

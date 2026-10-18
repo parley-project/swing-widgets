@@ -113,8 +113,8 @@ public class GradientPanel extends JPanel  {
 		// Create the gradient paint
 		GradientPaint paint = null;
 
-		Color sc = getForeground();
-		Color ec = getBackground();
+		Color sc = gradientEnd(this);
+		Color ec = gradientStart(this);
 
 		switch( direction )
 		{
@@ -161,5 +161,30 @@ public class GradientPanel extends JPanel  {
 		g2d.setPaint( oldPaint );
 
 		super.paintComponent( g );
+	}
+
+	/** The light color this panel paints with: the background set on it, or the current theme's. */
+	public Color getGradientStart() {
+		return gradientStart(this);
+	}
+
+	/** The dark color this panel paints with: the foreground set on it, or the current theme's. */
+	public Color getGradientEnd() {
+		return gradientEnd(this);
+	}
+
+	/**
+	 * The light color a gradient component paints with: the one set on it, or the current theme's
+	 * if it was left to the look (null or a UIResource), so it follows theme changes.
+	 */
+	static Color gradientStart(java.awt.Component c) {
+		Color bg = c.getBackground();
+		return bg == null || bg instanceof javax.swing.plaf.UIResource ? Theme.current().getStart() : bg;
+	}
+
+	/** The dark color a gradient component paints with; see {@link #gradientStart}. */
+	static Color gradientEnd(java.awt.Component c) {
+		Color fg = c.getForeground();
+		return fg == null || fg instanceof javax.swing.plaf.UIResource ? Theme.current().getEnd() : fg;
 	}
 }

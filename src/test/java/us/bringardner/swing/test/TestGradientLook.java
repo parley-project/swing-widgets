@@ -46,7 +46,9 @@ public class TestGradientLook {
 		assertEquals(start, UIManager.getColor("ScrollBar.track"));
 		assertEquals(end, UIManager.getColor("ScrollBar.thumb"));
 		assertEquals(end, UIManager.getColor("Tree.selectionBackground"));
-		assertEquals(start, UIManager.getColor("Tree.selectionForeground"));
+		// selected text is white on the dark color: light gold on dark gold was too faint
+		assertEquals(Color.white, UIManager.getColor("Tree.selectionForeground"));
+		assertEquals(Color.white, UIManager.getColor("TableHeader.foreground"));
 		assertEquals(end, UIManager.getColor("Table.gridColor"));
 		assertEquals(0, UIManager.getColor("Table.background").getAlpha());
 		assertEquals(end, UIManager.getColor("TableHeader.background"));
@@ -107,6 +109,9 @@ public class TestGradientLook {
 		inner.add(label);
 		GradientPanel gradient = new GradientPanel(GradientPanel.DIAGONAL_RIGHT);
 		gradient.setOpaque(true);
+		javax.swing.JCheckBox check = new javax.swing.JCheckBox("x");
+		check.setOpaque(true);
+		inner.add(check);
 		JTextArea text = new JTextArea();
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JPanel(), new JScrollPane(text));
 		outer.add(inner, BorderLayout.NORTH);
@@ -120,6 +125,7 @@ public class TestGradientLook {
 		assertFalse(split.isOpaque());
 		assertFalse(((JPanel) split.getLeftComponent()).isOpaque());
 		assertTrue(label.isOpaque(), "a control is left alone");
+		assertFalse(check.isOpaque(), "a check box shows the gradient");
 		assertTrue(text.isOpaque(), "a text area is left alone");
 		assertTrue(gradient.isOpaque(), "a gradient panel is left alone");
 	}

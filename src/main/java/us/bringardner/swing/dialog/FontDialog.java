@@ -136,8 +136,6 @@ public class FontDialog extends JDialog {
 		setBounds(100, 100, 475, 455);
 		contentPane = new GradientPanel(GradientPanel.DIAGONAL_RIGHT);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		contentPane.setForeground(GradientColors.getEnd());
-		contentPane.setBackground(GradientColors.getStart());
 
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(0, 0));
@@ -158,8 +156,6 @@ public class FontDialog extends JDialog {
 
 
 		buttonPanel = new GradientPanel(GradientPanel.DIAGONAL_RIGHT);
-		buttonPanel.setForeground(GradientColors.getEnd());
-		buttonPanel.setBackground(GradientColors.getStart());
 
 		contentPane.add(buttonPanel, BorderLayout.SOUTH);
 		GradientButton okButton = new GradientButton("Ok");
@@ -181,8 +177,6 @@ public class FontDialog extends JDialog {
 		buttonPanel.add(cancelButton);
 
 		previewPanel = new GradientPanel(GradientPanel.DIAGONAL_RIGHT);
-		previewPanel.setForeground(GradientColors.getEnd());
-		previewPanel.setBackground(GradientColors.getStart());
 
 
 		previewPanel.setPreferredSize(new Dimension(600, 100));
@@ -200,8 +194,6 @@ public class FontDialog extends JDialog {
 		scrollPane_3.getViewport().setOpaque(false);
 
 		contentPane.add(centerPanel, BorderLayout.CENTER);
-		centerPanel.setForeground(GradientColors.getEnd());
-		centerPanel.setBackground(GradientColors.getStart());
 
 		centerPanel.setLayout(new GridLayout(0, 3, 0, 0));
 

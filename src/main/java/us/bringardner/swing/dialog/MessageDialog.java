@@ -69,8 +69,9 @@ public class MessageDialog extends JDialog {
 
 	private final JPanel contentPanel = new GradientPanel(3);
 	private ImageIcon icon = MessageIcon;	
-	Color startColor = new Color(242, 206, 113);
-	Color endColor = new Color(150, 123, 40);
+	/** null: the current theme's (see Theme) */
+	Color startColor;
+	Color endColor;
 	
 	private boolean canceled=false;
 	private String message="";
@@ -134,14 +135,16 @@ public class MessageDialog extends JDialog {
 	public void setIcon(ImageIcon icon) {
 		this.icon = icon;
 	}
+	/** @return the light color: the one set, or the current theme's */
 	public Color getStartColor() {
-		return startColor;
+		return startColor != null ? startColor : us.bringardner.swing.gradient.Theme.current().getStart();
 	}
 	public void setStartColor(Color startColor) {
 		this.startColor = startColor;
 	}
+	/** @return the dark color: the one set, or the current theme's */
 	public Color getEndColor() {
-		return endColor;
+		return endColor != null ? endColor : us.bringardner.swing.gradient.Theme.current().getEnd();
 	}
 	public void setEndColor(Color endColor) {
 		this.endColor = endColor;
@@ -163,8 +166,13 @@ public class MessageDialog extends JDialog {
 
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		contentPanel.setBackground(startColor);
-		contentPanel.setForeground(endColor);
+		// set only if given; otherwise the panels follow the current theme
+		if( startColor != null ) {
+			contentPanel.setBackground(startColor);
+		}
+		if( endColor != null ) {
+			contentPanel.setForeground(endColor);
+		}
 
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
@@ -198,8 +206,12 @@ public class MessageDialog extends JDialog {
 		{
 			JPanel buttonPanel = new GradientPanel(GradientPanel.DIAGONAL_RIGHT);
 			buttonPanel.setOpaque(false);
-			buttonPanel.setBackground(contentPanel.getBackground());
-			buttonPanel.setForeground(contentPanel.getForeground());
+			if( startColor != null ) {
+				buttonPanel.setBackground(startColor);
+			}
+			if( endColor != null ) {
+				buttonPanel.setForeground(endColor);
+			}
 			buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 			getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 			{
