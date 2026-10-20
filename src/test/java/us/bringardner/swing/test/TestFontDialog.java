@@ -88,4 +88,10 @@ public class TestFontDialog {
 	public void cancelGivesNothing() {
 		assertNull(new Chooser().choose(new Font(Font.DIALOG, Font.PLAIN, 12), false));
 	}
+
+	@Test
+	public void closingItGivesNothing() {
+		us.bringardner.swing.datetime.test.SwingTestUtil.closeWhenShowing(FontDialog.class);
+		assertNull(new FontDialog().showDialog(new Font(Font.DIALOG, Font.PLAIN, 12)), "closing is cancelling");
+	}
 }

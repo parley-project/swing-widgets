@@ -87,4 +87,13 @@ public class TestWidgets {
 		assertTrue(ScrollBarUI.createUI(null) instanceof ScrollBarUI);
 		assertNotNull(new GlassPane());
 	}
+
+	/** Closing a message dialog with its close button answers No: only OK says yes. */
+	@Test
+	public void closingAMessageDialogIsNo() {
+		org.junit.jupiter.api.Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(), "needs a display");
+		MessageDialog d = new MessageDialog();
+		us.bringardner.swing.datetime.test.SwingTestUtil.closeWhenShowing(MessageDialog.class);
+		assertEquals(MessageDialog.Response.No, d.showDialog());
+	}
 }

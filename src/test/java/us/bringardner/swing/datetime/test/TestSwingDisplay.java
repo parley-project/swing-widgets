@@ -351,6 +351,28 @@ public class TestSwingDisplay {
 		assertFalse(t.isCanceled());
 	}
 
+	/** Closing a dialog with its close button cancels it: only OK accepts. */
+	@Test
+	public void testClosingADialogCancelsIt() {
+		assumeDisplay();
+		Date date = date(2018, Calendar.JUNE, 30, 21, 10);
+
+		DateAndTimeDialog dt = new DateAndTimeDialog();
+		SwingTestUtil.closeWhenShowing(DateAndTimeDialog.class);
+		assertSame(date, dt.showDialog(date, "Label"));
+		assertTrue(dt.isCanceled());
+
+		DateDialog d = new DateDialog();
+		SwingTestUtil.closeWhenShowing(DateDialog.class);
+		assertSame(date, d.showDialog(date, "Date"));
+		assertTrue(d.isCanceled());
+
+		TimeDialog t = new TimeDialog();
+		SwingTestUtil.closeWhenShowing(TimeDialog.class);
+		assertSame(date, t.showDialog(date, "Time"));
+		assertTrue(t.isCanceled());
+	}
+
 	@Test
 	public void testDateTimeComboBrowse() throws Exception {
 		assumeDisplay();

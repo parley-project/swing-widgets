@@ -334,6 +334,7 @@ public class FontDialog extends JDialog {
 	}
 
 	public Font showDialog(Font current) {
+		canceled = true; // only OK accepts: Cancel, the close button, Escape or anything else that closes it cancels
 		setModal(true);
 		Font ret = null;
 		if( current != null ) {

@@ -133,6 +133,16 @@ public class TestSettingsPages {
 	}
 
 	@Test
+	public void closingTheWindowCancels() {
+		GradientLook.install();
+		SettingsPages.register("test.mine", Page::new);
+		Dialog d = new Dialog();
+		d.dispatchEvent(new java.awt.event.WindowEvent(d, java.awt.event.WindowEvent.WINDOW_CLOSING));
+		assertEquals(1, ((Page) d.getPages().get(0)).cancels, "the pages take back their changes");
+		assertFalse(d.isAccepted());
+	}
+
+	@Test
 	public void cancelTellsThePages() {
 		GradientLook.install();
 		SettingsPages.register("test.mine", Page::new);

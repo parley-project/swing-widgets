@@ -120,7 +120,14 @@ public class SettingsDialog extends JDialog {
 		this.prefs = prefs;
 		this.original = Appearance.current();
 		this.chosen = original;
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		// closing it any way but OK cancels: the pages take back what they changed
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		addWindowListener(new java.awt.event.WindowAdapter() {
+			@Override
+			public void windowClosing(java.awt.event.WindowEvent e) {
+				cancel();
+			}
+		});
 		build();
 		show(chosen);
 		pack();

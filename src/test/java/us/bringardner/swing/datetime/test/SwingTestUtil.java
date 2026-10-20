@@ -137,4 +137,30 @@ public class SwingTestUtil {
 		timer.start();
 		return timer;
 	}
+
+	/**
+	 * Start a Swing timer that waits for a visible window of the given type and closes it as the
+	 * window's close button does (a WINDOW_CLOSING event). Use before showing a modal dialog.
+	 */
+	public static Timer closeWhenShowing(Class<? extends Window> type) {
+		AtomicInteger ticks = new AtomicInteger();
+		Timer timer = new Timer(100, null);
+		timer.addActionListener(e -> {
+			for(Window w : Window.getWindows()) {
+				if( type.isInstance(w) && w.isShowing()) {
+					timer.stop();
+					w.dispatchEvent(new java.awt.event.WindowEvent(w, java.awt.event.WindowEvent.WINDOW_CLOSING));
+					if( w.isShowing() && ticks.get() > 100 ) {
+						w.dispose();
+					}
+					return;
+				}
+			}
+			if( ticks.incrementAndGet() > 100) {
+				timer.stop();
+			}
+		});
+		timer.start();
+		return timer;
+	}
 }

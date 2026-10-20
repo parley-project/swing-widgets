@@ -285,6 +285,7 @@ public class MessageDialog extends JDialog {
 		yesButton.setText(getYesButtonText());
 		noButton.setText(getNoButtonText());
 		
+		canceled = true; // only OK accepts: Cancel, the close button, Escape or anything else that closes it cancels
 		setModal(true);
 		setLocationRelativeTo(null);
 		setVisible(true);

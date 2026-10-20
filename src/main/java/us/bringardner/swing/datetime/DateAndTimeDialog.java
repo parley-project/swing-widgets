@@ -68,7 +68,7 @@ public class DateAndTimeDialog extends javax.swing.JDialog implements ICalendarD
 	}
 
 	public Date showDialog(Date date, String label) {
-		canceled = false; // each showing starts afresh (an instance may be shown again)
+		canceled = true; // only OK accepts: Cancel, the close button, Escape or anything else that closes it cancels
 		displayLabel.setText(label);
 		datePanel.setDate(date);
 		timePanel.setTime(date);
@@ -151,6 +151,7 @@ public class DateAndTimeDialog extends javax.swing.JDialog implements ICalendarD
 	}
 
 	private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {
+		canceled = false;
 		dispose();
 	}
 
