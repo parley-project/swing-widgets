@@ -323,6 +323,34 @@ public class TestSwingDisplay {
 		assertTrue(cancel.isCanceled());
 	}
 
+	/** A dialog shown again after a Cancel returns the new choice when OK is pressed. */
+	@Test
+	public void testDialogsShownAgainAfterCancel() {
+		assumeDisplay();
+		Date date = date(2018, Calendar.JUNE, 30, 21, 10);
+
+		DateAndTimeDialog dt = new DateAndTimeDialog();
+		clickWhenShowing(DateAndTimeDialog.class, "Cancel");
+		assertSame(date, dt.showDialog(date, "Label"));
+		clickWhenShowing(DateAndTimeDialog.class, "OK");
+		assertNotSame(date, dt.showDialog(date, "Label"), "OK the second time");
+		assertFalse(dt.isCanceled());
+
+		DateDialog d = new DateDialog();
+		clickWhenShowing(DateDialog.class, "Cancel");
+		assertSame(date, d.showDialog(date, "Date"));
+		clickWhenShowing(DateDialog.class, "OK");
+		assertNotSame(date, d.showDialog(date, "Date"));
+		assertFalse(d.isCanceled());
+
+		TimeDialog t = new TimeDialog();
+		clickWhenShowing(TimeDialog.class, "Cancel");
+		assertSame(date, t.showDialog(date, "Time"));
+		clickWhenShowing(TimeDialog.class, "OK");
+		assertNotSame(date, t.showDialog(date, "Time"));
+		assertFalse(t.isCanceled());
+	}
+
 	@Test
 	public void testDateTimeComboBrowse() throws Exception {
 		assumeDisplay();

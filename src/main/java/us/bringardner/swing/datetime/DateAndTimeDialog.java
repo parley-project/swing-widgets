@@ -68,6 +68,7 @@ public class DateAndTimeDialog extends javax.swing.JDialog implements ICalendarD
 	}
 
 	public Date showDialog(Date date, String label) {
+		canceled = false; // each showing starts afresh (an instance may be shown again)
 		displayLabel.setText(label);
 		datePanel.setDate(date);
 		timePanel.setTime(date);

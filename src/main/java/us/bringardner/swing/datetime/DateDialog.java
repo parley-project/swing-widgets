@@ -111,6 +111,7 @@ public class DateDialog extends javax.swing.JDialog implements ICalendarDialog {
 
 
 	public Date showDialog(Date date,String label) {
+		canceled = false; // each showing starts afresh (an instance may be shown again)
 		setModal(true);
 		datePanel1.setDate(date);
 		setVisible(true);

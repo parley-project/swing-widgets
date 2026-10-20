@@ -66,6 +66,7 @@ public class TimeDialog extends javax.swing.JDialog implements ICalendarDialog {
 	}
 
 	public Date showDialog(Date date,String label) {
+		canceled = false; // each showing starts afresh (an instance may be shown again)
 		timePanel.setTime(date);
 		setVisible(true);
 		if (!canceled) {
