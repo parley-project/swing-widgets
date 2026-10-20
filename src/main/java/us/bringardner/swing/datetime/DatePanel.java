@@ -169,16 +169,28 @@ public class DatePanel extends javax.swing.JPanel {
 	private void yearSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {
 		Date oldValue = cal.getTime();
 		Integer year = (Integer) yearSpinner.getValue();
-		cal.set(Calendar.YEAR, year.intValue());
+		setKeepingTheDay(Calendar.YEAR, year.intValue());
 		setDate(cal.getTime());
 		Date newValue = cal.getTime();
 		firePropertyChange(PROP_DATE_CHANGED, oldValue, newValue);
 	}
 
+	/**
+	 * Set the year or month, keeping the day of the month where the new month has it, else its
+	 * last day: January 31 to February is February 28 (or 29), not March 3; February 29 to a
+	 * year that isn't a leap year is February 28.
+	 */
+	private void setKeepingTheDay(int field, int value) {
+		int day = cal.get(Calendar.DAY_OF_MONTH);
+		cal.set(Calendar.DAY_OF_MONTH, 1);
+		cal.set(field, value);
+		cal.set(Calendar.DAY_OF_MONTH, Math.min(day, cal.getActualMaximum(Calendar.DAY_OF_MONTH)));
+	}
+
 	private void monthComboActionPerformed(java.awt.event.ActionEvent evt) {
 		Date oldValue = cal.getTime();
 		int mo = monthCombo.getSelectedIndex();
-		cal.set(Calendar.MONTH, mo);
+		setKeepingTheDay(Calendar.MONTH, mo);
 		setDate(cal.getTime());
 		Date newValue = cal.getTime();
 		firePropertyChange(PROP_DATE_CHANGED, oldValue, newValue);

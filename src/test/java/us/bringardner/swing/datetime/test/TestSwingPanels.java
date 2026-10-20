@@ -355,6 +355,29 @@ public class TestSwingPanels {
 
 	}
 
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testDatePanelKeepsTheMonthAndYearChosen() {
+		DatePanel panel = new DatePanel(date(2021, Calendar.JANUARY, 31, 12, 0, 0, 0));
+		named(panel, "monthCombo", javax.swing.JComboBox.class).setSelectedIndex(Calendar.FEBRUARY);
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(panel.getDate());
+		assertEquals(Calendar.FEBRUARY, cal.get(Calendar.MONTH), "February, not March");
+		assertEquals(28, cal.get(Calendar.DAY_OF_MONTH), "its last day");
+
+		panel.setDate(date(2020, Calendar.FEBRUARY, 29, 12, 0, 0, 0));
+		named(panel, "yearSpinner", javax.swing.JSpinner.class).setValue(2021);
+		cal.setTime(panel.getDate());
+		assertEquals(2021, cal.get(Calendar.YEAR));
+		assertEquals(Calendar.FEBRUARY, cal.get(Calendar.MONTH), "still February");
+		assertEquals(28, cal.get(Calendar.DAY_OF_MONTH));
+
+		panel.setDate(date(2021, Calendar.MARCH, 15, 12, 0, 0, 0));
+		named(panel, "monthCombo", javax.swing.JComboBox.class).setSelectedIndex(Calendar.APRIL);
+		cal.setTime(panel.getDate());
+		assertEquals(15, cal.get(Calendar.DAY_OF_MONTH), "a day every month has is kept");
+	}
+
 	@Test
 	public void testDatePanelTodayButton() {
 		DatePanel panel = new DatePanel();
