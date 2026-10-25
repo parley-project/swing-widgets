@@ -13,6 +13,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 
 public class GlassPane extends JComponent implements MouseListener {
@@ -67,31 +68,21 @@ public class GlassPane extends JComponent implements MouseListener {
 	BufferedImage rotated = image;
 
 	
-	Runnable blink = new Runnable() {
-
-		@Override
-		public void run() {
-			try {
-				System.out.println("Start blink");
-				while(isVisible()) {
-					Thread.sleep(delay);
-					if( angle !=0) {
-						rotated = rotateImage(image, angle);					
-					}
-					//System.out.println("before blink");
-					SwingUtilities.invokeAndWait(()->repaint());
-					//System.out.println("after blink");
-					
-					if( (angle+=10)>=360) {
-						angle = 0;
-					}		
-				}
-			} catch (Exception e) {
-				// TODO: handle exception
-			}
-			System.out.println("Stop blink");
+	/**
+	 * Turns the globe while the pane is visible. A Swing timer runs on the event thread, and
+	 * there is only ever one, however often the pane is shown and hidden.
+	 */
+	private final Timer blink = new Timer(delay, e->{
+		if( !isVisible()) {
+			((Timer) e.getSource()).stop();
+			return;
 		}
-	};
+		if( (angle+=10)>=360) {
+			angle = 0;
+		}
+		rotated = angle == 0 ? image : rotateImage(image, angle);
+		repaint();
+	});
 
 	public GlassPane() {
 		super();
@@ -99,11 +90,26 @@ public class GlassPane extends JComponent implements MouseListener {
 	}
 
 	@Override
-	public void setVisible(boolean aFlag) {				
+	public void setVisible(boolean aFlag) {
 		super.setVisible(aFlag);
-		if( aFlag) {
-			new Thread(blink).start();
-		} 
+		if( blink == null ) {
+			// called while the component is being made
+			return;
+		}
+		Runnable change = ()->{
+			if( aFlag ) {
+				if( !blink.isRunning()) {
+					blink.start();
+				}
+			} else {
+				blink.stop();
+			}
+		};
+		if( SwingUtilities.isEventDispatchThread()) {
+			change.run();
+		} else {
+			SwingUtilities.invokeLater(change);
+		}
 	}
 
 	protected void paintComponent(Graphics g) {

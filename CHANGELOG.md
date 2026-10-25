@@ -91,6 +91,12 @@
 - In the gold theme, selected rows and table headers have white text: light gold on dark gold was
   hard to read.
 
+### Fixed
+
+- `GlassPane` turns its globe with one Swing timer on the event thread: each `setVisible(true)`
+  started another thread, so showing it again (or hiding and showing it quickly) left several
+  turning and repainting at once.
+
 ## swing-widgets 1.0.0 (2026-10-16)
 
 The Swing date and time components are now in their own library, split out of BjlCore / parley-core
