@@ -355,7 +355,7 @@ public class TestSwingPanels {
 
 	}
 
-	@SuppressWarnings("unchecked")
+	
 	@Test
 	public void testDatePanelKeepsTheMonthAndYearChosen() {
 		DatePanel panel = new DatePanel(date(2021, Calendar.JANUARY, 31, 12, 0, 0, 0));
