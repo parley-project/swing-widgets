@@ -34,8 +34,7 @@ import java.util.prefs.Preferences;
 
 /**
  * A list of recently used items, newest first, saved with java.util.prefs.Preferences.
- * It uses no UI toolkit: {@link RecentItemsMenu} shows it as a Swing menu, and fx-widgets'
- * RecentItemsMenu as a JavaFX one. Both read and write the same preferences, so they share a list.
+ * It uses no UI toolkit: {@link RecentItemsMenu} shows it as a Swing menu.
  * <p>
  * A {@link Codec} turns each item into one line of text and back. Items are the same entry
  * when they are equal ({@link Object#equals(Object)}).

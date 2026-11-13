@@ -27,10 +27,8 @@ It's a library of its own, with no dependencies, for two reasons:
   carried Swing along. Now only applications with a Swing UI need it.
 - **It isn't tied to Parley.** Any Swing application can use it without pulling in Parley.
 
-[fx-widgets](https://github.com/parley-project/fx-widgets) is the JavaFX counterpart, but not a
-copy: JavaFX already has much of what's here (CSS styling, `Alert`, prompt text, `Task` progress),
-so it only fills JavaFX's own gaps. The recent list behind both menus (`RecentItems`) is in this
-library because it has no UI and no dependencies, so both toolkits can reach it.
+A JavaFX counterpart, fx-widgets, was built beside it until November 2026. It is retired; the tag
+`javafx-final` in its repository is its last version.
 
 **Use swing-widgets** when your application's UI is Swing. Swing runs on any desktop JDK from Java
 11, with nothing extra to install.
@@ -53,7 +51,7 @@ library because it has no UI and no dependencies, so both toolkits can reach it.
 | | `DateDialog`, `TimeDialog`, `DateAndTimeDialog` | Modal dialogs built from the panels. |
 | | `DateTimeCombo` | A date/time spinner with a button that opens `DateAndTimeDialog`. |
 | `us.bringardner.swing.menu` | `RecentItemsMenu` | A "Recent ..." menu of any kind of item, saved with `java.util.prefs.Preferences`. |
-| | `RecentItems` | The list behind that menu, without any UI: newest first, a maximum, saved with `Preferences`. fx-widgets' JavaFX menu uses it too, so the two share a list. |
+| | `RecentItems` | The list behind that menu, without any UI: newest first, a maximum, saved with `Preferences`. |
 | | `StandardMenus` | The menu bar every Parley application uses: File, Edit, View, the application's menus, Window and Help, with About, Settings… and Quit where each platform expects them. |
 | `us.bringardner.swing.progress` | `ProgressMonitorUpdater` | Lets any thread update a Swing `ProgressMonitor`; the changes are made on the event dispatch thread. |
 | `us.bringardner.swing.gradient` | `GradientPanel`, `GradientButton` | A panel painted with a two-color gradient, and a rounded gradient button. |
@@ -71,20 +69,19 @@ library because it has no UI and no dependencies, so both toolkits can reach it.
 
 ## JavaFX alternatives
 
-What to use in a JavaFX application instead of each component here. Most are built into JavaFX; what
-isn't is in [fx-widgets](https://github.com/parley-project/fx-widgets) or, where noted, not yet
-available.
+What to use in a JavaFX application instead of each component here. Most are built into JavaFX;
+where noted, there's nothing yet.
 
 | swing-widgets | In JavaFX |
 |---|---|
 | `DatePanel`, `DayPanel`, `DateDialog` | `DatePicker` (built in) |
-| `TimePanel`, `Clock`, `TimeDialog` | None: JavaFX has no time picker, and fx-widgets doesn't have one yet |
+| `TimePanel`, `Clock`, `TimeDialog` | None: JavaFX has no time picker |
 | `DateAndTimeDialog`, `DateTimeCombo` | None yet; `DatePicker` covers only the date |
-| `RecentItemsMenu` | fx-widgets' `RecentItemsMenu`, which shares its list with this one |
-| `RecentItems` | The same class: both menus use it |
-| `StandardMenus` | fx-widgets' `StandardMenus`: the same layout for a JavaFX `MenuBar` |
+| `RecentItemsMenu` | None yet |
+| `RecentItems` | The same class: it uses no UI toolkit |
+| `StandardMenus` | None yet |
 | `ProgressMonitorUpdater` | A `Task`: call `updateProgress` and `updateMessage` from any thread, and bind a `ProgressBar` to its `progressProperty()` |
-| `GradientLook` | fx-widgets' `GradientLook`: a stylesheet with the same look |
+| `GradientLook` | None yet; CSS can give a JavaFX application the same colors |
 | `GradientPanel`, `GradientButton`, `GradientColors` | CSS: `-fx-background-color: linear-gradient(...)` and `-fx-background-radius` |
 | `MessageDialog` | `Alert` and `TextInputDialog` |
 | `FontDialog` | None built in (ControlsFX, a separate library, has `FontSelectorDialog`) |
@@ -185,8 +182,7 @@ macOS, Metal elsewhere); set `GradientColors` first for other colors. `apply(win
 or dialog's content on a `GradientPanel` and makes its layout panels, trees, tables and lists
 see-through, leaving controls and text areas alone. For finer control, `seeThrough(scrollPane)` and
 `seeThroughPanels(container)` do those parts on their own. A library's own windows use `follow(window)` instead: it applies
-the look only if the application installed it. For JavaFX, use
-fx-widgets' `GradientLook`, which has the same colors.
+the look only if the application installed it.
 
 ### Letting users choose the font and colors
 

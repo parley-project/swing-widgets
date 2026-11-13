@@ -40,8 +40,7 @@ import javax.swing.JOptionPane;
  * moves the entry to the top and passes the event to the menu's ActionListeners with the
  * value openItem returned as its source.
  * <p>
- * The list itself is a {@link RecentItems}, which uses no UI toolkit; fx-widgets' JavaFX
- * RecentItemsMenu uses it too. A {@link Codec} turns each item into one line of text and back.
+ * The list itself is a {@link RecentItems}, which uses no UI toolkit. A {@link Codec} turns each item into one line of text and back.
  * Items are the same entry when they are equal ({@link Object#equals(Object)}).
  * <p>
  * Subclasses can change the label shown for an item ({@link #getLabel(Object)}), drop items
