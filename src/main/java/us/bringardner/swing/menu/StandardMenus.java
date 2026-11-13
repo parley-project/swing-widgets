@@ -74,7 +74,7 @@ public class StandardMenus {
 	private Runnable settings;
 	private BooleanSupplier quit;
 
-	/** @param appName the application's name, as About shows it ("About fsh-ide") */
+	/** @param appName the application's name, as About shows it ("About Fsh Studio") */
 	public StandardMenus(String appName) {
 		this.appName = appName;
 	}

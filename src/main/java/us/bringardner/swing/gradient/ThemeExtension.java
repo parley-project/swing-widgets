@@ -39,7 +39,7 @@ import javax.swing.JComponent;
 public interface ThemeExtension {
 
 	/**
-	 * The prefix of its keys in a theme file, such as {@code fsh-ide.editor}: letters, digits, dots
+	 * The prefix of its keys in a theme file, such as {@code fsh-studio.editor}: letters, digits, dots
 	 * and dashes, unique to the application.
 	 */
 	String getId();
