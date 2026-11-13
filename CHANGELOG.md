@@ -1,6 +1,6 @@
 # Changelog
 
-## swing-widgets 1.1.0 (unreleased)
+## swing-widgets 2.0.0 (unreleased)
 
 ### Added
 
