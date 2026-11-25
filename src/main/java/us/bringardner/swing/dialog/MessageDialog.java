@@ -31,7 +31,8 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.Box;
 import javax.swing.ImageIcon;
@@ -259,18 +260,29 @@ public class MessageDialog extends JDialog {
 		return showDialog();
 	}
 
-	LinkedBlockingQueue<Response> queue = new LinkedBlockingQueue<>();
-	
+	/**
+	 * {@link #showDialog()} from any thread: on another thread than the event thread it waits for the dialog to be
+	 * answered, and returns the answer. (It used to put the dialog on the event thread and return at once, with no
+	 * answer, so a copy that asked "Overwrite it?" went on whatever the user said.)
+	 * @return the answer; No if the waiting thread is interrupted or the dialog can't be shown
+	 */
 	public Response showDialogThreadSafe() {
-		if(!SwingUtilities.isEventDispatchThread()) {
-			SwingUtilities.invokeLater(()->{
-				queue.add(showDialog());
-			});
-			
-			return queue.poll();
-		} else {
+		if( SwingUtilities.isEventDispatchThread() ) {
 			return showDialog();
 		}
+		final AtomicReference<Response> answer = new AtomicReference<>(Response.No);
+		try {
+			SwingUtilities.invokeAndWait(()->answer.set(showDialog()));
+		} catch (InterruptedException e) {
+			// not answered: nothing is confirmed, and the question is taken away
+			SwingUtilities.invokeLater(this::dispose);
+			Thread.currentThread().interrupt();
+			return Response.No;
+		} catch (InvocationTargetException e) {
+			// the dialog failed: nothing is confirmed
+			return Response.No;
+		}
+		return answer.get();
 	}
 	
 	public Response showDialog() {
