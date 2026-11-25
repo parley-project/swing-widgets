@@ -2,6 +2,14 @@
 
 ## swing-widgets 2.0.0 (unreleased)
 
+### Fixed (2026-11-25)
+
+- **`MessageDialog.showDialogThreadSafe()` waits for the answer.** From a thread that isn't the event thread it put the
+  dialog on the event thread and returned at once with null, so what asked a question with it (parley-files-viewer's
+  copy: "already exists. Overwrite it?") went on whatever the answer was, and the answers piled up in a queue that a
+  later call could read. It now returns the answer of the dialog (`invokeAndWait`), and No if the waiting thread is
+  interrupted.
+
 ### Added
 
 - `us.bringardner.swing.gradient.FileIcon`: a file to go with `FolderIcon`, a page with a folded
